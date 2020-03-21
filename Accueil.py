@@ -7,7 +7,7 @@ def ChangePage():
     window.quit()
 
 if __name__ == '__main__':
-
+#pppppppppppphjzhkek
     window=Tk()
     window.title("SPACE JUMPER 3000")
     window.geometry("1280x720+40+50")
