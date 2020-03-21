@@ -139,6 +139,8 @@ Wplan.bind_all('q', Gauche)
 
 Attaque()
 
+#JOEKPFOJGNREIGNEPOFJKEJFOZE
+
 while True:
     window.update_idletasks()
     window.update()
