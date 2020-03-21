@@ -24,6 +24,7 @@ if __name__ == '__main__':
     Wplan.grid()
     Wplan.create_image(640, 360, image=Ciel)
 
+#hjklmhjkl
 
     Jouer=Button(window, text='Jouer', width=5, height=1, font =Times, command = lambda : ChangePage())
     Jouer.grid()
