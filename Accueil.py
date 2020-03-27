@@ -3,11 +3,11 @@ from tkinter import font
 import os
 
 def ChangePage():
-    os.startfile("PartieJeu.py")
+    os.startfile("C:/Users/remi1/PycharmProjects/SpaceJumper3000/PartieJeu.py")
     window.quit()
 
 if __name__ == '__main__':
-#pourrr teesssssteeeeeer
+
     window=Tk()
     window.title("SPACE JUMPER 3000")
 
