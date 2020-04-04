@@ -4,50 +4,66 @@ import random
 import time
 from timeit import default_timer
 
+UneFoisTouche = False
+DeuxFoisTouche = False
+TroisFoisTouche = False
 
 def Haut(evt):
     global Wplan
     global Wfusee
+    global UneFoisTouche
+    global DeuxFoisTouche
+    global TroisFoisTouche
 
-    Position = Wplan.coords(Wfusee)
-    PosY = Position.pop(1)
+    PositionFusee = Wplan.coords(Wfusee)
+    PosY = PositionFusee.pop(1)
     if PosY - 65> 15:  # L'axe des ordonnées est dirigé vers le bas
-        Wplan.coords(Wfusee, Position, PosY - 65)
+        Wplan.coords(Wfusee, PositionFusee, PosY - 65)
     else:
-        Wplan.coords(Wfusee, Position, PosY)
+        Wplan.coords(Wfusee, PositionFusee, PosY)
 
 def Bas(evt):
     global Wplan
     global Wfusee
+    global UneFoisTouche
+    global DeuxFoisTouche
+    global TroisFoisTouche
 
-    Position = Wplan.coords(Wfusee)
-    PosY = Position.pop(1)
+
+    PositionFusee = Wplan.coords(Wfusee)
+    PosY = PositionFusee.pop(1)
     if PosY +65 < 705:  # L'axe des ordonnées est dirigé vers le bas
-        Wplan.coords(Wfusee, Position, PosY + 65)
+        Wplan.coords(Wfusee, PositionFusee, PosY + 65)
     else:
-        Wplan.coords(Wfusee, Position, PosY)
+        Wplan.coords(Wfusee, PositionFusee, PosY)
 
 def Gauche(evt):
     global Wplan
     global Wfusee
 
-    Position = Wplan.coords(Wfusee)
-    PosX = Position.pop(0)
+    PositionFusee = Wplan.coords(Wfusee)
+    PosX = PositionFusee.pop(0)
     if PosX - 30 > 15:  # L'axe des ordonnées est dirigé vers le bas
-        Wplan.coords(Wfusee, PosX - 30, Position)
+        Wplan.coords(Wfusee, PosX - 30, PositionFusee)
     else:
-        Wplan.coords(Wfusee, PosX, Position)
+        Wplan.coords(Wfusee, PosX, PositionFusee)
 
 def Droite(evt):
     global Wplan
     global Wfusee
+    global UneFoisTouche
+    global DeuxFoisTouche
+    global TroisFoisTouche
 
-    Position = Wplan.coords(Wfusee)
-    PosX = Position.pop(0)
+    PositionFusee = Wplan.coords(Wfusee)
+
+    PosX = PositionFusee.pop(0)
     if PosX + 30 < 400:  # L'axe des ordonnées est dirigé vers le bas
-        Wplan.coords(Wfusee, PosX +30, Position)
+        Wplan.coords(Wfusee, PosX +30, PositionFusee)
     else:
-        Wplan.coords(Wfusee, PosX, Position)
+        Wplan.coords(Wfusee, PosX, PositionFusee)
+
+
 
 def Hub(evt):
     global Laser
@@ -295,6 +311,7 @@ def Attaque():
     global mesImages
     global Wplan
     global Wasteroide
+    global CoordonneesAsteroide
 
     Wplan.delete(Wasteroide)
     Wasteroide = Wplan.create_image(AsteroX, AsteroY, image=mesImages[NumImage])
@@ -305,8 +322,41 @@ def Attaque():
         NumImage=0
         AsteroX=random.randint(750, 1200)
         AsteroY = random.randint(100, 620)
-    Wplan.after(600 , Attaque)
+    #print(Wplan.coords(Wasteroide))
+    #print(CoordonneesAsteroide)
+    Wplan.after(50 , Attaque)
 
+'''
+def Collision():
+    global x1Astero
+    global x2Astero
+    global y1Astero
+    global y2Astero
+    global x1fusee
+    global x2fusee
+    global y1fusee
+    global y2fusee
+    global TroisCarre
+    PositionFusee = Wplan.coords(Wfusee)
+    print(PositionFusee)
+    CoordoneesFusee = (x1fusee, y1fusee, x2fusee, y2fusee)  # Coordonées complète de la fusée
+    print(CoordoneesFusee)
+    x1fusee = Wplan.coords(Wfusee).pop(0) - (0.5 * 152)  # Coordonées du coin en Haut à Gauche de la fusée
+    y1fusee = Wplan.coords(Wfusee).pop(1) + (0.5 * 100)  # Coordonnée du coin en Haut à Gauche de la fusée
+    x2fusee = Wplan.coords(Wfusee).pop(0) + (0.5 * 152)  # Coordonnée du coin en Bas à Droite de la fusée
+    y2fusee = Wplan.coords(Wfusee).pop(1) - (0.5 * 100)  # Coordonnée du coin en Bas à Droite de la fusée
+    CoordoneesFusee = [x1fusee, y1fusee, x2fusee, y2fusee]  # Coordonées complète de la fusée
+    print(CoordoneesFusee)
+
+    if len(Wplan.find_overlapping(CoordoneesFusee[0], CoordoneesFusee[1], CoordoneesFusee[2],
+                                CoordoneesFusee[3])) == 3:
+        Wplan.itemconfig(Barre, image=DeuxCarre)
+        print("!!!!!!!!!COLLISION!!!!!!!!!!")
+
+    return len(Wplan.find_overlapping(CoordoneesFusee[0], CoordoneesFusee[1], CoordoneesFusee[2],
+                                CoordoneesFusee[3]))
+
+'''
 
 def chronometre():
     now = default_timer() - start
@@ -336,6 +386,7 @@ Times = font.Font(family='Times', size=18, weight='bold')
 Ciel=PhotoImage(file='Ciel.png')
 Fusee=PhotoImage(file='fusée2.png')
 Laser=PhotoImage(file='Laser.png')
+
 
 #---------Variables cordos----------#
 LaserX=0
@@ -391,17 +442,43 @@ for i in range(24):
     nom = "img\Astéroïde" + str(i) + ".png"
     mesImages.append(PhotoImage(file=nom))
 
+
 #---Affichage Chrono ---#
 start = default_timer()
 chrono = Wplan.create_text(40, 20)
 
 #---------------#
+PositionAstero = Wplan.coords(Wasteroide)
 AsteroX=random.randint(750, 1200)
 AsteroY=random.randint(100, 620)
 Deltax=50
 NumImage=0
 temps=2500
+#---Coordonnées Astéroïde---#
 
+x1Astero = AsteroX - (0.5*(Wplan.coords(Wasteroide).pop(0))) #Coordonées du coin en Haut à Gauche de la fusée
+y1Astero = AsteroY + (0.5*(Wplan.coords(Wasteroide).pop(1))) #Coordonnée du coin en Haut à Gauche de la fusée
+x2Astero = AsteroX + (0.5*(Wplan.coords(Wasteroide).pop(0))) #Coordonées du coin en Haut à Gauche de la fusée
+y2Astero = AsteroY - (0.5*(Wplan.coords(Wasteroide).pop(1))) #Coordonnée du coin en Haut à Gauche de la fusée
+
+CoordonneesAsteroide = (x1Astero,y1Astero,x2Astero,y2Astero)
+
+
+#---Coordonées du centre de la Fusée---#
+PositionFusee = Wplan.coords(Wfusee)
+print("La fusée est à :" ,PositionFusee)
+PosFuseeX = PositionFusee.pop(0)
+print("La fusée est à :",PosFuseeX)
+PosFuseeY = Wplan.coords(Wfusee).pop(1)
+
+"""
+x1fusee = Wplan.coords(Wfusee).pop(0) - (0.5 * 152)  # Coordonées du coin en Haut à Gauche de la fusée
+y1fusee = Wplan.coords(Wfusee).pop(1) + (0.5 * 100)  # Coordonnée du coin en Haut à Gauche de la fusée
+x2fusee = Wplan.coords(Wfusee).pop(0) + (0.5 * 152)  # Coordonnée du coin en Bas à Droite de la fusée
+y2fusee = Wplan.coords(Wfusee).pop(1) - (0.5 * 100)  # Coordonnée du coin en Bas à Droite de la fusée
+CoordoneesFusee = [x1fusee, y1fusee, x2fusee, y2fusee]  # Coordonées complète de la fusée
+print(CoordoneesFusee)
+"""
 Finit=False
 #-----Déplacement fusée -----#
 Wplan.bind_all('z', Haut)
@@ -410,12 +487,16 @@ Wplan.bind_all('d', Droite)
 Wplan.bind_all('q', Gauche)
 
 #----Tir laser--------#
-
-
 Wplan.bind_all('<space>', Hub)
 
-#------#
+#---Barre de Vie---#
+TroisCarre=PhotoImage(file='img/Barre de Progression/3.png')
+Barre = Wplan.create_image(largeur_fenetre*0.957, hauteur_fenetre*0.026, image=TroisCarre)
+DeuxCarre=PhotoImage(file='img/Barre de Progression/2.png')
+UnCarre=PhotoImage(file='img/Barre de Progression/1.png')
+GameOver=PhotoImage(file='img/Barre de Progression/Game Over.png')
 
+#Collision()
 chronometre()
 Attaque()
 
