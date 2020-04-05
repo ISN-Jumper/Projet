@@ -1,9 +1,11 @@
+# -*- coding: utf-8 -*-
+#
+
 from tkinter import *
 from tkinter import font
 import random
-import time
 from timeit import default_timer
-
+from PIL import Image, ImageTk
 
 def Haut(evt):
     global Wplan
@@ -49,7 +51,7 @@ def Droite(evt):
     else:
         Wplan.coords(Wfusee, PosX, Position)
 
-def Hub(evt):
+def HubLaser(evt):
     global Laser
     global LaserX
     global LaserY
@@ -287,6 +289,21 @@ def Tir10():
         Wplan.coords(Perso10, xf, LaserY10)
         Wplan.after(3, Tir10)
 
+def HubAsteroide(evt):
+    global str_time
+    if str_time=='0:00:00':
+        Attaque()
+    elif str_time=='0:00:10':
+        Attaque2()
+    elif str_time=='0:00:30':
+        Attaque3()
+    elif str_time=='0:01:00':
+        Attaque4()
+    elif str_time=='0:02:00':
+        Attaque5()
+    elif str_time=='0:05:00':
+        Attaque6()
+
 def Attaque():
     global AsteroX
     global AsteroY
@@ -307,14 +324,22 @@ def Attaque():
         AsteroY = random.randint(100, 620)
     Wplan.after(600 , Attaque)
 
-
 def chronometre():
+    global str_time
+
     now = default_timer() - start
     minutes, seconds = divmod(now, 60)
     hours, minutes = divmod(minutes, 60)
     str_time = "%d:%02d:%02d" % (hours, minutes, seconds)
     Wplan.itemconfigure(chrono, text=str_time, fill='white', font=Times)
     window.after(1000, chronometre)
+
+def Exit(evt):
+    window.attributes('-fullscreen', True)
+    Wplan.bind_all('<Escape>', Tixe)
+def Tixe(evt):
+    window.attributes('-fullscreen', False)
+    Wplan.bind_all('<Escape>', Exit)
 
 
 window=Tk()
@@ -323,21 +348,22 @@ window.title("SPACE JUMPER 3000")
 # Faire en sorte que la taille de la fenêtre s'adapte à n'importe quel écran :
 largeur_fenetre = window.winfo_screenwidth()
 hauteur_fenetre = window.winfo_screenheight()
-
 window.geometry("%dx%d+0+0" % (largeur_fenetre, hauteur_fenetre))
-#window.geometry("1280x720+40+50")
 
 #------- Police -------#
 
 Times = font.Font(family='Times', size=18, weight='bold')
 
 #---------Image-------#
-
-Ciel=PhotoImage(file='Ciel.png')
+#Ciel=PhotoImage(file='Ciel.png')
 Fusee=PhotoImage(file='fusée2.png')
 Laser=PhotoImage(file='Laser.png')
+print("largeur", largeur_fenetre,"hauteur", hauteur_fenetre)
+
 
 #---------Variables cordos----------#
+str_time=0
+
 LaserX=0
 LaserY=0
 LaserX2=0
@@ -362,12 +388,18 @@ LaserY10=0
 Persos=[[50,50],[250,250]]
 Mvt=[[10,0],[-10,-10]]
 
+
 #------------- Graphique accueil --------#
 
-Wplan=Canvas(window, width=largeur_fenetre-4, height=hauteur_fenetre-68)
+Wplan=Canvas(window, width=largeur_fenetre, height=hauteur_fenetre)
 Wplan.grid()
 
-Wplan.create_image(640, 360, image=Ciel)
+
+Ciel=Image.open('Ciel.png')
+Ciel = Ciel.resize((largeur_fenetre, hauteur_fenetre), Image.ANTIALIAS)
+WCiel=ImageTk.PhotoImage(Ciel)
+Wplan.create_image((largeur_fenetre//2)-2, (hauteur_fenetre//2)-2, image=WCiel)
+
 AffichageChrono = Wplan.create_text(largeur_fenetre//2,hauteur_fenetre//2)
 
 Wfusee=Wplan.create_image(100,360, image=Fusee)
@@ -411,8 +443,8 @@ Wplan.bind_all('q', Gauche)
 
 #----Tir laser--------#
 
-
-Wplan.bind_all('<space>', Hub)
+Wplan.bind_all('<space>', HubLaser)
+Wplan.bind_all('<Escape>', Exit)
 
 #------#
 
