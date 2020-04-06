@@ -3,10 +3,18 @@ from tkinter import font
 import random
 import time
 from timeit import default_timer
+from threading import Thread
 
-UneFoisTouche = False
-DeuxFoisTouche = False
-TroisFoisTouche = False
+PremiereCollision = False
+DeuxiemeCollision = False
+TroisiemeCollision = False
+LaCollision = False
+
+PremiereChance = True
+DeuxiemeChance = True
+TrosiemeChance = True
+
+LeJoueurGagne = True
 
 def Haut(evt):
     global Wplan
@@ -14,6 +22,8 @@ def Haut(evt):
     global UneFoisTouche
     global DeuxFoisTouche
     global TroisFoisTouche
+
+
 
     PositionFusee = Wplan.coords(Wfusee)
     PosY = PositionFusee.pop(1)
@@ -51,9 +61,6 @@ def Gauche(evt):
 def Droite(evt):
     global Wplan
     global Wfusee
-    global UneFoisTouche
-    global DeuxFoisTouche
-    global TroisFoisTouche
 
     PositionFusee = Wplan.coords(Wfusee)
 
@@ -324,39 +331,55 @@ def Attaque():
         AsteroY = random.randint(100, 620)
     #print(Wplan.coords(Wasteroide))
     #print(CoordonneesAsteroide)
-    Wplan.after(50 , Attaque)
+    Wplan.after(500 , Attaque)
 
-'''
-def Collision():
-    global x1Astero
-    global x2Astero
-    global y1Astero
-    global y2Astero
-    global x1fusee
-    global x2fusee
-    global y1fusee
-    global y2fusee
-    global TroisCarre
-    PositionFusee = Wplan.coords(Wfusee)
-    print(PositionFusee)
-    CoordoneesFusee = (x1fusee, y1fusee, x2fusee, y2fusee)  # Coordonées complète de la fusée
-    print(CoordoneesFusee)
-    x1fusee = Wplan.coords(Wfusee).pop(0) - (0.5 * 152)  # Coordonées du coin en Haut à Gauche de la fusée
-    y1fusee = Wplan.coords(Wfusee).pop(1) + (0.5 * 100)  # Coordonnée du coin en Haut à Gauche de la fusée
-    x2fusee = Wplan.coords(Wfusee).pop(0) + (0.5 * 152)  # Coordonnée du coin en Bas à Droite de la fusée
-    y2fusee = Wplan.coords(Wfusee).pop(1) - (0.5 * 100)  # Coordonnée du coin en Bas à Droite de la fusée
-    CoordoneesFusee = [x1fusee, y1fusee, x2fusee, y2fusee]  # Coordonées complète de la fusée
-    print(CoordoneesFusee)
 
-    if len(Wplan.find_overlapping(CoordoneesFusee[0], CoordoneesFusee[1], CoordoneesFusee[2],
-                                CoordoneesFusee[3])) == 3:
-        Wplan.itemconfig(Barre, image=DeuxCarre)
-        print("!!!!!!!!!COLLISION!!!!!!!!!!")
+class Collision(Thread):
+    def __init__(self):
+        Thread.__init__(self)
+        self.start()
+    def run(self):
+        global PremiereCollision
+        global DeuxiemeCollision
+        global TroisiemeCollision
+        global Collision
+        global NombreDeVie
+        global LaCollision
+        global Wplan
+        global AsteroY
+        global AsteroX
 
-    return len(Wplan.find_overlapping(CoordoneesFusee[0], CoordoneesFusee[1], CoordoneesFusee[2],
-                                CoordoneesFusee[3]))
+        while LaCollision==False:
+            x1fusee = Wplan.coords(Wfusee).pop(0) - (0.5 * 152)  # Coordonées du coin en Haut à Gauche de la fusée
+            y1fusee = Wplan.coords(Wfusee).pop(1) + (0.5 * 100)  # Coordonnée du coin en Haut à Gauche de la fusée
+            x2fusee = Wplan.coords(Wfusee).pop(0) + (0.5 * 152)  # Coordonnée du coin en Bas à Droite de la fusée
+            y2fusee = Wplan.coords(Wfusee).pop(1) - (0.5 * 100)  # Coordonnée du coin en Bas à Droite de la fusée
+            CoordoneesFusee = [x1fusee, y1fusee, x2fusee, y2fusee]  # Coordonées complète de la fusée
 
-'''
+            if len(Wplan.find_overlapping(CoordoneesFusee[0], CoordoneesFusee[1], CoordoneesFusee[2],
+                                          CoordoneesFusee[3])) == 3:
+                print("!!!!!!!!!COLLISION11111!!!!!!!!!!")
+                NombreDeVie -= 1
+                AsteroX = random.randint(750, 1200)
+                AsteroY = random.randint(100, 620)
+                print(LaCollision)
+            else:
+                LaCollision = False
+
+
+NombreDeVie = 3
+
+class BarreDeVie(Thread):
+    def __init__(self):
+        Thread.__init__(self)
+        self.start()
+    def run(self):
+        global NombreDeVie
+        global LaCollision
+        if NombreDeVie == 2 and LaCollision == True:
+            Wplan.itemconfig(Barre, image=DeuxCarre)
+
+
 
 def chronometre():
     now = default_timer() - start
@@ -486,6 +509,9 @@ Wplan.bind_all('s', Bas)
 Wplan.bind_all('d', Droite)
 Wplan.bind_all('q', Gauche)
 
+#---Nombre de vies---#
+NombresVie = 3
+
 #----Tir laser--------#
 Wplan.bind_all('<space>', Hub)
 
@@ -496,7 +522,9 @@ DeuxCarre=PhotoImage(file='img/Barre de Progression/2.png')
 UnCarre=PhotoImage(file='img/Barre de Progression/1.png')
 GameOver=PhotoImage(file='img/Barre de Progression/Game Over.png')
 
-#Collision()
+
+Collision()
+BarreDeVie()
 chronometre()
 Attaque()
 
