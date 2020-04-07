@@ -289,28 +289,12 @@ def Tir10():
         Wplan.coords(Perso10, xf, LaserY10)
         Wplan.after(3, Tir10)
 
-def HubAsteroide(evt):
-    global str_time
-    if str_time=='0:00:00':
-        Attaque()
-    elif str_time=='0:00:10':
-        Attaque2()
-    elif str_time=='0:00:30':
-        Attaque3()
-    elif str_time=='0:01:00':
-        Attaque4()
-    elif str_time=='0:02:00':
-        Attaque5()
-    elif str_time=='0:05:00':
-        Attaque6()
-
 def Attaque():
     global AsteroX
     global AsteroY
     global Deltax
     global NumImage
     global mesImages
-    global Wplan
     global Wasteroide
 
     Wplan.delete(Wasteroide)
@@ -416,7 +400,7 @@ perso9=0
 perso10=0
 
 tour=0
-
+passage=0
 Wasteroide=Wplan.create_image(random.randint(750, 1200), random.randint(100, 620))
 mesImages=[]
 for i in range(24):
