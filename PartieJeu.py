@@ -4,6 +4,7 @@ import random
 import time
 from timeit import default_timer
 from threading import Thread
+import os
 
 PremiereCollision = False
 DeuxiemeCollision = False
@@ -342,43 +343,51 @@ class Collision(Thread):
         global PremiereCollision
         global DeuxiemeCollision
         global TroisiemeCollision
-        global Collision
         global NombreDeVie
         global LaCollision
         global Wplan
         global AsteroY
         global AsteroX
 
-        while LaCollision==False:
-            x1fusee = Wplan.coords(Wfusee).pop(0) - (0.5 * 152)  # Coordonées du coin en Haut à Gauche de la fusée
-            y1fusee = Wplan.coords(Wfusee).pop(1) + (0.5 * 100)  # Coordonnée du coin en Haut à Gauche de la fusée
-            x2fusee = Wplan.coords(Wfusee).pop(0) + (0.5 * 152)  # Coordonnée du coin en Bas à Droite de la fusée
-            y2fusee = Wplan.coords(Wfusee).pop(1) - (0.5 * 100)  # Coordonnée du coin en Bas à Droite de la fusée
-            CoordoneesFusee = [x1fusee, y1fusee, x2fusee, y2fusee]  # Coordonées complète de la fusée
+        for i in range(3):
+            time.sleep(1)
+            while LaCollision == False:
+                x1fusee = Wplan.coords(Wfusee).pop(0) - (0.5 * 152)  # Coordonées du coin en Haut à Gauche de la fusée
+                y1fusee = Wplan.coords(Wfusee).pop(1) + (0.5 * 100)  # Coordonnée du coin en Haut à Gauche de la fusée
+                x2fusee = Wplan.coords(Wfusee).pop(0) + (0.5 * 152)  # Coordonnée du coin en Bas à Droite de la fusée
+                y2fusee = Wplan.coords(Wfusee).pop(1) - (0.5 * 100)  # Coordonnée du coin en Bas à Droite de la fusée
+                CoordoneesFusee = [x1fusee, y1fusee, x2fusee, y2fusee]  # Coordonées complète de la fusée
 
-            if len(Wplan.find_overlapping(CoordoneesFusee[0], CoordoneesFusee[1], CoordoneesFusee[2],
-                                          CoordoneesFusee[3])) == 3:
-                print("!!!!!!!!!COLLISION11111!!!!!!!!!!")
-                NombreDeVie -= 1
-                AsteroX = random.randint(750, 1200)
-                AsteroY = random.randint(100, 620)
-                print(LaCollision)
-            else:
-                LaCollision = False
+                if len(Wplan.find_overlapping(CoordoneesFusee[0], CoordoneesFusee[1], CoordoneesFusee[2],
+                                              CoordoneesFusee[3])) == 3:
+                    print("!!!!!!!!!COLLISION11111!!!!!!!!!!")
+                    NombreDeVie -= 0.5
+                    LaCollision = True
+                    AsteroX = random.randint(750, 1200)
+                    AsteroY = random.randint(100, 620)
+                    print(LaCollision)
+            while LaCollision == True:
+                if len(Wplan.find_overlapping(CoordoneesFusee[0], CoordoneesFusee[1], CoordoneesFusee[2],
+                                              CoordoneesFusee[3])) == 3:
+                    print("!!!!!!!!!COLLISION11111!!!!!!!!!!")
+                    NombreDeVie -= 0.5
+                    LaCollision = False
+                    AsteroX = random.randint(750, 1200)
+                    AsteroY = random.randint(100, 620)
+                    print(LaCollision)
+                if NombreDeVie == 2 and LaCollision == False:
+                    Wplan.itemconfig(Barre, image=DeuxCarre)
+                if NombreDeVie == 1 and LaCollision == False:
+                    Wplan.itemconfig(Barre, image=UnCarre)
+                if NombreDeVie == 0 and LaCollision == False:
+                    Wplan.itemconfig(Barre, image=GameOver)
+                if NombreDeVie == 0:
+                    os.startfile("C:/Users/User/Desktop/ProjetTest2/GameOverPage.py")
+                    window.quit()
+
 
 
 NombreDeVie = 3
-
-class BarreDeVie(Thread):
-    def __init__(self):
-        Thread.__init__(self)
-        self.start()
-    def run(self):
-        global NombreDeVie
-        global LaCollision
-        if NombreDeVie == 2 and LaCollision == True:
-            Wplan.itemconfig(Barre, image=DeuxCarre)
-
 
 
 def chronometre():
@@ -524,7 +533,6 @@ GameOver=PhotoImage(file='img/Barre de Progression/Game Over.png')
 
 
 Collision()
-BarreDeVie()
 chronometre()
 Attaque()
 
