@@ -1,22 +1,9 @@
 from tkinter import *
 from tkinter import font
 import random
-import time
 from timeit import default_timer
-from threading import Thread
 import os
 from PIL import Image, ImageTk
-
-PremiereCollision = False
-DeuxiemeCollision = False
-TroisiemeCollision = False
-LaCollision = False
-
-PremiereChance = True
-DeuxiemeChance = True
-TrosiemeChance = True
-
-LeJoueurGagne = True
 
 def Haut(evt):
     global Wplan
@@ -81,19 +68,27 @@ def Attaque():
     global Wplan
     global Wasteroide
     global CoordonneesAsteroide
+    global Vivant
+    global Passe
 
-    Wplan.delete(Wasteroide)
-    Wasteroide = Wplan.create_image(AsteroX, AsteroY, image=mesImages[NumImage])
+    if Vivant ==True :
+        Passe=True
+        Wplan.delete(Wasteroide)
+        Wasteroide = Wplan.create_image(AsteroX, AsteroY, image=mesImages[NumImage])
+        NumImage += 1
+        AsteroX -= Deltax
+        if NumImage == 23:
+            NumImage = 0
+            AsteroX = random.randint(750, 1200)
+            AsteroY = random.randint(100, 620)
+        Wplan.after(500, Attaque)
 
-    NumImage += 1
-    AsteroX -= Deltax
-    if NumImage==23:
+    elif Vivant==False :
         NumImage=0
         AsteroX=random.randint(750, 1200)
         AsteroY = random.randint(100, 620)
-    #print(Wplan.coords(Wasteroide))
-    #print(CoordonneesAsteroide)
-    Wplan.after(500 , Attaque)
+        Vivant=True
+        Wplan.after(500,Attaque)
 
 class Perso:
     def __init__(self, Cordox, Cordoy, Wplan):
@@ -126,57 +121,34 @@ def Tixe(evt):
     window.attributes('-fullscreen', False)
     Wplan.bind_all('<Escape>', Exit)
 
-class Collision(Thread):
-    def __init__(self):
-        Thread.__init__(self)
-        self.start()
-    def run(self):
-        global PremiereCollision
-        global DeuxiemeCollision
-        global TroisiemeCollision
-        global NombreDeVie
-        global LaCollision
-        global Wplan
-        global AsteroY
-        global AsteroX
+def Collision():
+    global Wasteroide, Wfusee
+    global Barre
+    global Wplan
+    global AsteroX, AsteroY
+    global Vivant, Passe
+    global mesImages, NumImage
 
-        for i in range(3):
-            time.sleep(1)
-            while LaCollision == False:
-                x1fusee = Wplan.coords(Wfusee).pop(0) - (0.5 * 152)  # Coordonées du coin en Haut à Gauche de la fusée
-                y1fusee = Wplan.coords(Wfusee).pop(1) + (0.5 * 100)  # Coordonnée du coin en Haut à Gauche de la fusée
-                x2fusee = Wplan.coords(Wfusee).pop(0) + (0.5 * 152)  # Coordonnée du coin en Bas à Droite de la fusée
-                y2fusee = Wplan.coords(Wfusee).pop(1) - (0.5 * 100)  # Coordonnée du coin en Bas à Droite de la fusée
-                CoordoneesFusee = [x1fusee, y1fusee, x2fusee, y2fusee]  # Coordonées complète de la fusée
+    global PremiereCollision, DeuxiemeCollision, TroisiemeCollision
 
-                if len(Wplan.find_overlapping(CoordoneesFusee[0], CoordoneesFusee[1], CoordoneesFusee[2],
-                                              CoordoneesFusee[3])) == 3:
-                    print("!!!!!!!!!COLLISION11111!!!!!!!!!!")
-                    NombreDeVie -= 0.5
-                    LaCollision = True
-                    AsteroX = random.randint(750, 1200)
-                    AsteroY = random.randint(100, 620)
-                    print(LaCollision)
-            while LaCollision == True:
-                if len(Wplan.find_overlapping(CoordoneesFusee[0], CoordoneesFusee[1], CoordoneesFusee[2],
-                                              CoordoneesFusee[3])) == 3:
-                    print("!!!!!!!!!COLLISION11111!!!!!!!!!!")
-                    NombreDeVie -= 0.5
-                    LaCollision = False
-                    AsteroX = random.randint(750, 1200)
-                    AsteroY = random.randint(100, 620)
-                    print(LaCollision)
-                if NombreDeVie == 2 and LaCollision == False:
+    if Passe==True:
+        if (Wplan.coords(Wfusee)[0])+72.5 >= (Wplan.coords(Wasteroide)[0])-50  :
+            if (Wplan.coords(Wfusee)[1])+25 >= (Wplan.coords(Wasteroide)[1])-50 > (Wplan.coords(Wfusee)[1])-25 or (Wplan.coords(Wfusee)[1])-25 <= (Wplan.coords(Wasteroide)[1])+50 < (Wplan.coords(Wfusee)[1])+25 or (Wplan.coords(Wasteroide)[1])+50 >= (Wplan.coords(Wfusee)[1])+25 > (Wplan.coords(Wfusee)[1])-25 >= (Wplan.coords(Wasteroide)[1])-50 :
+                Passe=False
+                Vivant=False
+                Wplan.itemconfig(Wasteroide, image=Invisible)
+                if PremiereCollision==False:
                     Wplan.itemconfig(Barre, image=DeuxCarre)
-                if NombreDeVie == 1 and LaCollision == False:
+                    PremiereCollision=True
+                elif DeuxiemeCollision==False:
                     Wplan.itemconfig(Barre, image=UnCarre)
-                if NombreDeVie == 0 and LaCollision == False:
-                    Wplan.itemconfig(Barre, image=GameOver)
-                if NombreDeVie == 0:
+                    DeuxiemeCollision=True
+                elif DeuxiemeCollision==True:
                     os.startfile("C:/Users/remi1/PycharmProjects/SpaceJumper3000/GameOverPage.py")
                     window.quit()
 
-NombreDeVie = 3
+    Wplan.after(50, Collision)
+
 
 def chronometre():
     now = default_timer() - start
@@ -207,7 +179,6 @@ window.after(10, animation_laser)
 #Ciel=PhotoImage(file='Ciel.png')
 Fusee=PhotoImage(file='fusée2.png')
 Laser=PhotoImage(file='Laser.png')
-
 
 #------------- Graphique accueil --------#
 
@@ -290,10 +261,15 @@ DeuxCarre=PhotoImage(file='img/Barre de Progression/2.png')
 UnCarre=PhotoImage(file='img/Barre de Progression/1.png')
 GameOver=PhotoImage(file='img/Barre de Progression/Game Over.png')
 
+Invisible=PhotoImage(file='invisible.png')
+Vivant=True
+Passe=True
+
+PremiereCollision = False
+DeuxiemeCollision = False
 
 Collision()
 chronometre()
 Attaque()
-
 
 window.mainloop()
