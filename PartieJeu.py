@@ -189,7 +189,6 @@ WCCiel=Image.open('Ciel.png')
 WCCiel = WCCiel.resize((largeur_fenetre, hauteur_fenetre), Image.ANTIALIAS)
 Ciel=ImageTk.PhotoImage(WCCiel)
 WCiel=Wplan.create_image((largeur_fenetre//2)-2, (hauteur_fenetre//2)-2, image=Ciel)
-#Wplan.create_image(640, 360, image=Ciel)
 
 AffichageChrono = Wplan.create_text(largeur_fenetre//2,hauteur_fenetre//2)
 
@@ -213,31 +212,6 @@ AsteroY=random.randint(100, 620)
 Deltax=50
 NumImage=0
 temps=2500
-#---Coordonnées Astéroïde---#
-
-x1Astero = AsteroX - (0.5*(Wplan.coords(Wasteroide).pop(0))) #Coordonées du coin en Haut à Gauche de la fusée
-y1Astero = AsteroY + (0.5*(Wplan.coords(Wasteroide).pop(1))) #Coordonnée du coin en Haut à Gauche de la fusée
-x2Astero = AsteroX + (0.5*(Wplan.coords(Wasteroide).pop(0))) #Coordonées du coin en Haut à Gauche de la fusée
-y2Astero = AsteroY - (0.5*(Wplan.coords(Wasteroide).pop(1))) #Coordonnée du coin en Haut à Gauche de la fusée
-
-CoordonneesAsteroide = (x1Astero,y1Astero,x2Astero,y2Astero)
-
-
-#---Coordonées du centre de la Fusée---#
-PositionFusee = Wplan.coords(Wfusee)
-print("La fusée est à :" ,PositionFusee)
-PosFuseeX = PositionFusee.pop(0)
-print("La fusée est à :",PosFuseeX)
-PosFuseeY = Wplan.coords(Wfusee).pop(1)
-
-"""
-x1fusee = Wplan.coords(Wfusee).pop(0) - (0.5 * 152)  # Coordonées du coin en Haut à Gauche de la fusée
-y1fusee = Wplan.coords(Wfusee).pop(1) + (0.5 * 100)  # Coordonnée du coin en Haut à Gauche de la fusée
-x2fusee = Wplan.coords(Wfusee).pop(0) + (0.5 * 152)  # Coordonnée du coin en Bas à Droite de la fusée
-y2fusee = Wplan.coords(Wfusee).pop(1) - (0.5 * 100)  # Coordonnée du coin en Bas à Droite de la fusée
-CoordoneesFusee = [x1fusee, y1fusee, x2fusee, y2fusee]  # Coordonées complète de la fusée
-print(CoordoneesFusee)
-"""
 
 #-----Déplacement fusée -----#
 Wplan.bind_all('z', Haut)
