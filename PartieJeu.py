@@ -132,7 +132,7 @@ def Collision():
     global PremiereCollision, DeuxiemeCollision, TroisiemeCollision
 
     if Passe==True:
-        if (Wplan.coords(Wfusee)[0])+72.5 >= (Wplan.coords(Wasteroide)[0])-50  :
+        if (Wplan.coords(Wfusee)[0])+72.5 >= (Wplan.coords(Wasteroide)[0])-50 and (Wplan.coords(Wfusee)[0])-72.5 <= (Wplan.coords(Wasteroide)[0])-50 :
             if (Wplan.coords(Wfusee)[1])+25 >= (Wplan.coords(Wasteroide)[1])-50 > (Wplan.coords(Wfusee)[1])-25 or (Wplan.coords(Wfusee)[1])-25 <= (Wplan.coords(Wasteroide)[1])+50 < (Wplan.coords(Wfusee)[1])+25 or (Wplan.coords(Wasteroide)[1])+50 >= (Wplan.coords(Wfusee)[1])+25 > (Wplan.coords(Wfusee)[1])-25 >= (Wplan.coords(Wasteroide)[1])-50 :
                 Passe=False
                 Vivant=False
