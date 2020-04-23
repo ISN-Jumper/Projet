@@ -4,16 +4,16 @@ import random
 from timeit import default_timer
 import os
 from PIL import Image, ImageTk
+import time
+from threading import *
+
+LaCollision = False
+EcranTraverse = False
+LaCollisionLaser = False
 
 def Haut(evt):
     global Wplan
     global Wfusee
-    global UneFoisTouche
-    global DeuxFoisTouche
-    global TroisFoisTouche
-
-
-
     PositionFusee = Wplan.coords(Wfusee)
     PosY = PositionFusee.pop(1)
     if PosY - 65> 15:  # L'axe des ordonnées est dirigé vers le bas
@@ -24,11 +24,6 @@ def Haut(evt):
 def Bas(evt):
     global Wplan
     global Wfusee
-    global UneFoisTouche
-    global DeuxFoisTouche
-    global TroisFoisTouche
-
-
     PositionFusee = Wplan.coords(Wfusee)
     PosY = PositionFusee.pop(1)
     if PosY +65 < 705:  # L'axe des ordonnées est dirigé vers le bas
@@ -39,7 +34,6 @@ def Bas(evt):
 def Gauche(evt):
     global Wplan
     global Wfusee
-
     PositionFusee = Wplan.coords(Wfusee)
     PosX = PositionFusee.pop(0)
     if PosX - 30 > 15:  # L'axe des ordonnées est dirigé vers le bas
@@ -52,7 +46,6 @@ def Droite(evt):
     global Wfusee
 
     PositionFusee = Wplan.coords(Wfusee)
-
     PosX = PositionFusee.pop(0)
     if PosX + 30 < 400:  # L'axe des ordonnées est dirigé vers le bas
         Wplan.coords(Wfusee, PosX +30, PositionFusee)
@@ -70,6 +63,7 @@ def Attaque():
     global CoordonneesAsteroide
     global Vivant
     global Passe
+    global EcranTraverse
 
     if Vivant ==True :
         Passe=True
@@ -77,6 +71,7 @@ def Attaque():
         Wasteroide = Wplan.create_image(AsteroX, AsteroY, image=mesImages[NumImage])
         NumImage += 1
         AsteroX -= Deltax
+
         if NumImage == 23:
             NumImage = 0
             AsteroX = random.randint(750, 1200)
@@ -98,10 +93,41 @@ class Perso:
     def animation(self):
         self.Wplan.move(self.id, 13, 0)
 
+
+
+class CollisionLaserAstero(Thread):
+    def __init__(self):
+        Thread.__init__(self)
+        self.start()
+    def run(self):
+        global Wplan
+        global AsteroX
+        global AsteroY
+        global LaCollisionLaser
+        global GenererAstero
+        while LaCollisionLaser == False:
+            Cordo = Wplan.coords(Wfusee)
+            print(Cordo)
+            x1laser = Cordo.pop(0) + 87.5 + 76 - (0.5 * 30)  # Coordonées du coin en Haut à Gauche de la fusée
+            y1laser = Cordo.pop(0) + 1 + (0.5 * 5)  # Coordonnée du coin en Haut à Gauche de la fusée
+            x2laser = Wplan.coords(Wfusee).pop(0) + 87.5 + 76 + (0.5 * 30)  # Coordonées du coin en Haut à Gauche de la fusée
+            y2laser = Wplan.coords(Wfusee).pop(0) + 1 - (0.5 * 5)  # Coordonnée du coin en Bas à Droite de la fusée
+            CoordoneesLaser = [x1laser, y1laser,x2laser,y2laser]  # Coordonées complète de la fusée
+            print((len(Wplan.find_overlapping(CoordoneesLaser[0], CoordoneesLaser[1], CoordoneesLaser[2],
+                                          CoordoneesLaser[3]))))
+
+            if len(Wplan.find_overlapping(CoordoneesLaser[0], CoordoneesLaser[1], CoordoneesLaser[2],
+                                          CoordoneesLaser[3])) == 2:
+                Wplan.delete(Wasteroide)
+                print("!!!!!!!!!COLLISIONAVECLELASER!!!!!!!!!!")
+                AsteroX = random.randint(750, 1200)
+                AsteroY = random.randint(100, 620)
+
+
 def Create_laser(event):
     Cordo = Wplan.coords(Wfusee)
-    LaserX = Cordo.pop(0) + 87.5
-    LaserY = Cordo.pop(0)
+    LaserX = Cordo.pop(0) + 87.5 + 20
+    LaserY = Cordo.pop(0) + 1
     personnage = Perso(LaserX, LaserY, Wplan)
     EnsembleLaser.add(personnage)
 
@@ -109,7 +135,7 @@ def animation_laser():
     for personnage in EnsembleLaser:
         personnage.animation()
         x0 = personnage.id
-        if x0 > largeur_fenetre:
+        if x0 > largeur_fenetre - 1:
             Wplan.delete(personnage.id)
             EnsembleLaser.remove(personnage)
     window.after(3, animation_laser)
@@ -121,34 +147,54 @@ def Tixe(evt):
     window.attributes('-fullscreen', False)
     Wplan.bind_all('<Escape>', Exit)
 
-def Collision():
-    global Wasteroide, Wfusee
-    global Barre
-    global Wplan
-    global AsteroX, AsteroY
-    global Vivant, Passe
-    global mesImages, NumImage
+class Collision(Thread):
+    def __init__(self):
+        Thread.__init__(self)
+        self.start()
+    def run(self):
+        global NombreDeVie
+        global LaCollision
+        global Wplan
+        global AsteroY
+        global AsteroX
 
-    global PremiereCollision, DeuxiemeCollision, TroisiemeCollision
+        for i in range(3):
+            time.sleep(1)
+            while LaCollision == False:
+                x1fusee = Wplan.coords(Wfusee).pop(0) - (0.5 * 152)  # Coordonées du coin en Haut à Gauche de la fusée
+                y1fusee = Wplan.coords(Wfusee).pop(1) + (0.5 * 100)  # Coordonnée du coin en Haut à Gauche de la fusée
+                x2fusee = Wplan.coords(Wfusee).pop(0) + (0.5 * 152)  # Coordonnée du coin en Bas à Droite de la fusée
+                y2fusee = Wplan.coords(Wfusee).pop(1) - (0.5 * 100)  # Coordonnée du coin en Bas à Droite de la fusée
+                CoordoneesFusee = [x1fusee, y1fusee, x2fusee, y2fusee]  # Coordonées complète de la fusée
 
-    if Passe==True:
-        if (Wplan.coords(Wfusee)[0])+72.5 >= (Wplan.coords(Wasteroide)[0])-50  :
-            if (Wplan.coords(Wfusee)[1])+25 >= (Wplan.coords(Wasteroide)[1])-50 > (Wplan.coords(Wfusee)[1])-25 or (Wplan.coords(Wfusee)[1])-25 <= (Wplan.coords(Wasteroide)[1])+50 < (Wplan.coords(Wfusee)[1])+25 or (Wplan.coords(Wasteroide)[1])+50 >= (Wplan.coords(Wfusee)[1])+25 > (Wplan.coords(Wfusee)[1])-25 >= (Wplan.coords(Wasteroide)[1])-50 :
-                Passe=False
-                Vivant=False
-                Wplan.itemconfig(Wasteroide, image=Invisible)
-                if PremiereCollision==False:
+                if len(Wplan.find_overlapping(CoordoneesFusee[0], CoordoneesFusee[1], CoordoneesFusee[2],
+                                              CoordoneesFusee[3])) == 3:
+                    print("!!!!!!!!!COLLISION11111!!!!!!!!!!")
+                    NombreDeVie -= 0.5
+                    LaCollision = True
+                    AsteroX = random.randint(750, 1200)
+                    AsteroY = random.randint(100, 620)
+                    print(LaCollision)
+            while LaCollision == True:
+                if len(Wplan.find_overlapping(CoordoneesFusee[0], CoordoneesFusee[1], CoordoneesFusee[2],
+                                              CoordoneesFusee[3])) == 3:
+                    print("!!!!!!!!!COLLISION11111!!!!!!!!!!")
+                    NombreDeVie -= 0.5
+                    LaCollision = False
+                    AsteroX = random.randint(750, 1200)
+                    AsteroY = random.randint(100, 620)
+                    print(LaCollision)
+                if NombreDeVie == 2 and LaCollision == False:
                     Wplan.itemconfig(Barre, image=DeuxCarre)
-                    PremiereCollision=True
-                elif DeuxiemeCollision==False:
+                if NombreDeVie == 1 and LaCollision == False:
                     Wplan.itemconfig(Barre, image=UnCarre)
-                    DeuxiemeCollision=True
-                elif DeuxiemeCollision==True:
-                    os.startfile("C:/Users/remi1/PycharmProjects/SpaceJumper3000/GameOverPage.py")
+                if NombreDeVie == 0 and LaCollision == False:
+                    Wplan.itemconfig(Barre, image=GameOver)
+                if NombreDeVie == 0:
+                    os.startfile("C:/Users/User/Desktop/ProjetTest2/GameOverPage.py")
                     window.quit()
 
-    Wplan.after(50, Collision)
-
+NombreDeVie = 3
 
 def chronometre():
     now = default_timer() - start
@@ -159,7 +205,66 @@ def chronometre():
     window.after(1000, chronometre)
 
 
-window=Tk()
+
+class GenererAstero(Thread):
+    def __init__(self):
+        Thread.__init__(self)
+        self.start()
+    def run(self):
+        global Passe
+        global mesImages
+        global EcranTraverse
+        listAsteroX = [random.randint(750, 1200)]
+        listAsteroY = [random.randint(100, 620)]
+        listNumImage = [0]
+        NumImage = 0
+        startTime = time.time()
+
+        while Vivant:
+            actualTime = time.time()
+            if actualTime >= startTime + 5:
+                listAsteroX.append(random.randint(750,1200))
+                listAsteroY.append(random.randint(100,620))
+                listNumImage.append(0)
+                startTime = actualTime
+            listAstero = []
+            for i in range(len(listAsteroX)):
+                Astero = Wplan.create_image(listAsteroX[i], listAsteroY[i], image=mesImages[listNumImage[i]])
+                listAstero.append(Astero)
+                listAsteroX[i] -= Deltax
+                if listNumImage[i] == 23:
+                    listAsteroX[i] = random.randint(750, 1200)
+                    listAsteroY[i] = random.randint(100, 620)
+                    listNumImage[i] = 0
+            time.sleep(0.5)
+            for Astero in listAstero:
+                Wplan.delete(Astero)
+
+
+
+'''
+
+def AutoAstero():
+    global Passe
+    global mesImages
+    global NumImage
+    AsteroX = random.randint(750, 1200)
+    AsteroY = random.randint(100, 620)
+    while Vivant == True:
+        Passe = True
+        Wplan.create_image(AsteroX, AsteroY, image=mesImages[NumImage])
+        NumImage += 1
+        AsteroX -= Deltax
+        time.sleep(1)
+        if NumImage == 23:
+            NumImage = 0
+            AsteroX = random.randint(750, 1200)
+            AsteroY = random.randint(100, 620)
+            Wplan.create_image(AsteroX, AsteroY, image=mesImages[NumImage])
+        Wplan.after(100, Attaque)
+'''
+
+window = Tk()
 window.title("SPACE JUMPER 3000")
 
 # Faire en sorte que la taille de la fenêtre s'adapte à n'importe quel écran :
@@ -195,6 +300,8 @@ AffichageChrono = Wplan.create_text(largeur_fenetre//2,hauteur_fenetre//2)
 Wfusee=Wplan.create_image(100,360, image=Fusee)
 
 Wasteroide=Wplan.create_image(random.randint(750, 1200), random.randint(100, 620))
+Astero = Wplan.create_image(random.randint(750, 1200), random.randint(100, 620))
+
 mesImages=[]
 for i in range(24):
     nom = "img\Astéroïde" + str(i) + ".png"
@@ -209,7 +316,7 @@ chrono = Wplan.create_text(40, 20)
 PositionAstero = Wplan.coords(Wasteroide)
 AsteroX=random.randint(750, 1200)
 AsteroY=random.randint(100, 620)
-Deltax=50
+Deltax=30
 NumImage=0
 temps=2500
 
@@ -235,15 +342,17 @@ DeuxCarre=PhotoImage(file='img/Barre de Progression/2.png')
 UnCarre=PhotoImage(file='img/Barre de Progression/1.png')
 GameOver=PhotoImage(file='img/Barre de Progression/Game Over.png')
 
-Invisible=PhotoImage(file='invisible.png')
+#Invisible=PhotoImage(file='invisible.png')
 Vivant=True
 Passe=True
 
 PremiereCollision = False
 DeuxiemeCollision = False
 
+CollisionLaserAstero()
 Collision()
 chronometre()
 Attaque()
+GenererAstero()
 
 window.mainloop()
