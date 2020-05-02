@@ -3,9 +3,10 @@
 from tkinter import *
 from tkinter import font
 import os
+from PIL import Image, ImageTk
 
 def ChangePage():
-    os.startfile("C:/Users/remi1/PycharmProjects/SpaceJumper3000/PartieJeu.py")
+    os.startfile("PartieJeu.py")
     window.quit()
 
 if __name__ == '__main__':
@@ -30,7 +31,10 @@ if __name__ == '__main__':
 
     Wplan=Canvas(window, width=largeur_fenetre, height=hauteur_fenetre)
     Wplan.grid()
-    Wplan.create_image(640, 360, image=Ciel)
+    WCCiel = Image.open('Ciel.png')
+    WCCiel = WCCiel.resize((largeur_fenetre, hauteur_fenetre), Image.ANTIALIAS)
+    Ciel = ImageTk.PhotoImage(WCCiel)
+    WCiel = Wplan.create_image((largeur_fenetre // 2) - 2, (hauteur_fenetre // 2) - 2, image=Ciel)
 
 
     Jouer=Button(window, text='Jouer', width=5, height=1, font =Times, command = lambda : ChangePage())
@@ -38,5 +42,6 @@ if __name__ == '__main__':
     Jouer.place(x=(largeur_fenetre//2), y=(hauteur_fenetre//1.5))
 
     Wquitter = Button(window, text="Quitter", command=window.quit).grid()
+
 
     window.mainloop()

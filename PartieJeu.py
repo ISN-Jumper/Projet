@@ -126,6 +126,7 @@ class Attaque_asteroide :
                     elif DeuxiemeCollision == True:
                         os.startfile("C:/Users/remi1/PycharmProjects/SpaceJumper3000/GameOverPage.py")
                         window.quit()
+                        #
 
 def Create_asteroide():
     global Temps_Generer, NumImage, mesImages
