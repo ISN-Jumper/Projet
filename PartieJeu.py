@@ -116,7 +116,7 @@ class Attaque_asteroide :
             if (Wplan.coords(Wfusee)[0]) + 72.5 >= (Wplan.coords(self.id)[0]) - 50 and (Wplan.coords(Wfusee)[0]) - 72.5 <= (Wplan.coords(self.id)[0]) + 50 :
                 if (Wplan.coords(Wfusee)[1]) + 25 >= (Wplan.coords(self.id)[1]) - 50 > (Wplan.coords(Wfusee)[1]) - 25 or (Wplan.coords(Wfusee)[1]) - 25 <= (Wplan.coords(self.id)[1]) + 50 < (Wplan.coords(Wfusee)[1]) + 25 or(Wplan.coords(self.id)[1]) + 50 >= (Wplan.coords(Wfusee)[1]) + 25 > (Wplan.coords(Wfusee)[1]) - 25 >= (Wplan.coords(self.id)[1]) - 50:
                     Wplan.itemconfig(self.id, image=Invisible)
-                    Wplan.coords(self.id, Wplan.coords(self.id)[0] -400, Wplan.coords(self.id)[1])
+                    Wplan.coords(self.id, Wplan.coords(self.id)[0] -460, Wplan.coords(self.id)[1])
                     if PremiereCollision == False:
                         Wplan.itemconfig(Barre, image=DeuxCarre)
                         PremiereCollision = True
@@ -339,7 +339,7 @@ largeur_fenetre = window.winfo_screenwidth()
 hauteur_fenetre = window.winfo_screenheight()
 
 window.geometry("%dx%d+0+0" % (largeur_fenetre, hauteur_fenetre))
-#window.geometry("1280x720+40+50")
+window.attributes('-fullscreen', True)
 
 #------- Police -------#
 

@@ -3,7 +3,7 @@ from tkinter import font
 import os
 
 def ChangePage():
-    os.startfile("C:/Users/User/Desktop/ProjetTest2/PartieJeu.py")
+    os.startfile("Accueil.py")
     window.quit()
 
 window = Tk()
@@ -14,7 +14,7 @@ largeur_fenetre = window.winfo_screenwidth()
 hauteur_fenetre = window.winfo_screenheight()
 
 window.geometry("%dx%d+0+0" % (largeur_fenetre, hauteur_fenetre))
-# window.geometry("1280x720+40+50")
+window.attributes('-fullscreen', True)
 
 # ------- Police -------#
 
