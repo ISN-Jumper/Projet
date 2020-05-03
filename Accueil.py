@@ -49,7 +49,7 @@ def FuseeAnim():
             deltaY+=10
             Wplan.delete(Wfusee)
             Wfusee = Wplan.create_image(deltaX, deltaY, image=mesImages[NumImage])
-            Wplan.after(20, FuseeAnim)
+            Wplan.after(4, FuseeAnim)
         elif deltaY >=525:
             TitreJumper()
 

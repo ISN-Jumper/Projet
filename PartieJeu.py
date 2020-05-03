@@ -353,7 +353,7 @@ window.after(10, animation_laser)
 window.after(10, animation_asteroide)
 #---------Image-------#
 
-Fusee=PhotoImage(file='fusée2.png')
+Fusee=PhotoImage(file='Fusées/Fusee0.png')
 Laser=PhotoImage(file='Laser.png')
 Invisible=PhotoImage(file='invisible.png')
 
