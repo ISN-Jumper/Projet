@@ -206,6 +206,7 @@ def animation_laser():
     global Astero
     global NumImage
     global listAstero, listAsteroX, listAsteroY
+    global NbrePoints
 
     for personnage in EnsembleLaser:
         personnage.animation()
@@ -226,15 +227,17 @@ def animation_laser():
                     NbreTentative += 1
                     print(NbreTentative)
                 if NbreTentative == 3:
-                    Explosion = mixer.Sound("AsteroideDetruit.wav")
-                    Explosion.set_volume(0.5)
-                    Explosion.play()
+                    AsteroideDetruit = mixer.Sound("AsteroideDetruit.wav")
+                    AsteroideDetruit.set_volume(0.5)
+                    AsteroideDetruit.play()
                     Wplan.delete(Astero)
                     idastero = listAstero.index(Astero)
                     listAstero.pop(idastero)
                     listAsteroX.pop(idastero)
                     listAsteroY.pop(idastero)
                     NbreTentative = 0
+                    NbrePoints += 1
+                    Wplan.itemconfig(CanvasPoints, text=('Nombre de Points :', NbrePoints))
     window.after(3, animation_laser)
 
 
@@ -277,8 +280,6 @@ class Collision(Thread):
                     print("!!!!!!!!!COLLISION11111!!!!!!!!!!")
                     NombreDeVie -= 0.5
                     LaCollision = True
-                    AsteroX = random.randint(750, 1200)
-                    AsteroY = random.randint(100, 620)
                     print(LaCollision)
             while LaCollision == True:
                 if len(Wplan.find_overlapping(CoordoneesFusee[0], CoordoneesFusee[1], CoordoneesFusee[2],
