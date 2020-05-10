@@ -231,12 +231,10 @@ def animation_laser():
                     print(NbreTentative)
                     Wplan.itemconfig(Astero, image=Invisible)
                     Wplan.coords(Astero, Wplan.coords(Astero)[0] -460, Wplan.coords(Astero)[1])
-
                     idAstero = listAstero.index(Astero)
                     listAstero.pop(idAstero)
                     listAsteroX.pop(idAstero)
                     listAsteroY.pop(idAstero)
-
                 if NbreTentative == 3:
                     Explosion = mixer.Sound("AsteroideDetruit.wav")
                     Explosion.set_volume(0.5)
