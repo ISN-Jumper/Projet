@@ -213,10 +213,6 @@ def animation_laser():
         if x0 > largeur_fenetre - 1:
             Wplan.delete(personnage.id)
             EnsembleLaser.remove(personnage)
-        listedepop = []
-
-        print("ListeAstéro",listAstero)
-        print(type(listAstero))
 
         for Astero in listAstero:
             if (Wplan.coords(personnage.id)[0]) + 20 >= (Wplan.coords(Astero)[0]) - 50 and (
@@ -229,16 +225,16 @@ def animation_laser():
                     Explosion.play()
                     NbreTentative += 1
                     print(NbreTentative)
-                    Wplan.itemconfig(Astero, image=Invisible)
-                    Wplan.coords(Astero, Wplan.coords(Astero)[0] -460, Wplan.coords(Astero)[1])
-                    idAstero = listAstero.index(Astero)
-                    listAstero.pop(idAstero)
-                    listAsteroX.pop(idAstero)
-                    listAsteroY.pop(idAstero)
                 if NbreTentative == 3:
                     Explosion = mixer.Sound("AsteroideDetruit.wav")
                     Explosion.set_volume(0.5)
                     Explosion.play()
+                    Wplan.delete(Astero)
+                    idastero = listAstero.index(Astero)
+                    listAstero.pop(idastero)
+                    listAsteroX.pop(idastero)
+                    listAsteroY.pop(idastero)
+                    NbreTentative = 0
     window.after(3, animation_laser)
 
 
@@ -328,8 +324,8 @@ class GenererAstero(Thread):
         while Vivant:
             actualTime = time.time()
             if actualTime >= startTime + 2:
-                listAsteroX.append(RandomX)
-                listAsteroY.append(RandomY)
+                listAsteroX.append(random.randint(750, 1200))
+                listAsteroY.append(random.randint(100, 620))
                 listNumImage.append(0)
                 startTime = actualTime
             listAstero = []
@@ -479,8 +475,7 @@ listAsteroX = [random.randint(750, 1200)]
 listAsteroY = [random.randint(100, 620)]
 listNumImage = [0]
 
-RandomX = random.randint(750, 1200)
-RandomY =  random.randint(100, 620)
+
 #--Nombres de Points---#
 NbrePoints = 0
 CanvasPoints = Wplan.create_text(largeur_fenetre/2, 20, text=('Nombre de Points :', NbrePoints), fill='white', font=Times)
