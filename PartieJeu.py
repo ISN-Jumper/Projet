@@ -6,10 +6,21 @@ import os
 from PIL import Image, ImageTk
 import time
 from threading import *
+from pygame import mixer
 
 LaCollision = False
 EcranTraverse = False
 LaCollisionLaser = False
+
+PremiereCollision = False
+DeuxiemeCollision = False
+TroisiemeCollision = False
+
+mixer.init()
+mixer.music.load("DuaLipa.mp3")
+mixer.music.play(-1)
+mixer.music.set_volume(0.2)
+
 
 def Haut(evt):
     global Wplan
@@ -52,6 +63,14 @@ def Droite(evt):
     else:
         Wplan.coords(Wfusee, PosX, PositionFusee)
 
+def Exit(evt):
+    window.attributes('-fullscreen', True)
+    Wplan.bind_all('<Escape>', Tixe)
+def Tixe(evt):
+    window.attributes('-fullscreen', False)
+    Wplan.bind_all('<Escape>', Exit)
+
+"""
 def Attaque():
     global AsteroX
     global AsteroY
@@ -84,8 +103,9 @@ def Attaque():
         AsteroY = random.randint(100, 620)
         Vivant=True
         Wplan.after(500,Attaque)
+"""
 
-
+"""
 class Attaque_asteroide :
     def __init__(self, Asterix, Obely, Wplan):
 
@@ -100,6 +120,8 @@ class Attaque_asteroide :
         global Vivant, Passe
         global PremiereCollision, DeuxiemeCollision, TroisiemeCollision
         global NumImage, mesImages, Wplan, tour
+        global Astero
+        global listAstero
 
         if Wplan.coords(self.id)[0] > -50 :
             self.Wplan.move(self.id, -23, 0)
@@ -124,8 +146,10 @@ class Attaque_asteroide :
                         Wplan.itemconfig(Barre, image=UnCarre)
                         DeuxiemeCollision = True
                     elif DeuxiemeCollision == True:
-                        os.startfile("C:/Users/remi1/PycharmProjects/SpaceJumper3000/GameOverPage.py")
+                        TroisiemeCollision = True
+                        os.startfile("GameOverPage.py")
                         window.quit()
+
 
 
 def Create_asteroide():
@@ -144,6 +168,7 @@ def animation_asteroide():
     for lasteroide in EnsembleAsteroide:
         lasteroide.animation_2()
     window.after(300, animation_asteroide)
+"""
 
 class Perso:
     def __init__(self, Cordox, Cordoy, Wplan):
@@ -151,63 +176,82 @@ class Perso:
         self.id = self.Wplan.create_image(Cordox, Cordoy, image=Laser)
 
     def animation(self):
+        global listAstero, Astero, NumImage
+        global NbrePoints
+        global Wplan
+        global NbreTentative
+
+        Wlaser = self.id
+
         self.Wplan.move(self.id, 6, 0)
 
+
+NbreTentative = 0
+
+
 def Create_laser(event):
+    global personnage
     Cordo = Wplan.coords(Wfusee)
-    LaserX = Cordo.pop(0) + 87.5
+    LaserX = Cordo.pop(0) + 87.5 + 10
     LaserY = Cordo.pop(0)
     personnage = Perso(LaserX, LaserY, Wplan)
     EnsembleLaser.add(personnage)
+    Bruitage = mixer.Sound("BruitageLaserWav.wav")
+    Bruitage.set_volume(0.05)
+    Bruitage.play()
+
 
 def animation_laser():
+    global NbreTentative
+    global Astero
+    global NumImage
+    global listAstero, listAsteroX, listAsteroY
+
     for personnage in EnsembleLaser:
         personnage.animation()
         x0 = personnage.id
         if x0 > largeur_fenetre - 1:
             Wplan.delete(personnage.id)
             EnsembleLaser.remove(personnage)
+        listedepop = []
+
+        print("ListeAstéro",listAstero)
+        print(type(listAstero))
+
+        for Astero in listAstero:
+            if (Wplan.coords(personnage.id)[0]) + 20 >= (Wplan.coords(Astero)[0]) - 50 and (
+            Wplan.coords(personnage.id)[0]) - 20 <= (Wplan.coords(Astero)[0]) + 50:
+                if (Wplan.coords(personnage.id)[1]) + 1.75 >= (Wplan.coords(Astero)[1]) - 50 > (Wplan.coords(personnage.id)[1]) - 1.75 or (Wplan.coords(personnage.id)[1]) - 1.75 <= (Wplan.coords(Astero)[1]) + 50 < (Wplan.coords(personnage.id)[1]) + 1.75 or (Wplan.coords(Astero)[1]) + 50 >= (Wplan.coords(personnage.id)[1]) + 1.75 > (Wplan.coords(personnage.id)[1]) - 1.75 >= (Wplan.coords(Astero)[1]) - 50:
+                    Wplan.itemconfig(personnage.id, image=Invisible)
+                    Wplan.coords(personnage.id, largeur_fenetre - 10, Wplan.coords(personnage.id)[1])
+                    Explosion = mixer.Sound("BruitageCraquement.wav")
+                    Explosion.set_volume(0.5)
+                    Explosion.play()
+                    NbreTentative += 1
+                    print(NbreTentative)
+                    Wplan.itemconfig(Astero, image=Invisible)
+                    Wplan.coords(Astero, Wplan.coords(Astero)[0] -460, Wplan.coords(Astero)[1])
+
+                    idAstero = listAstero.index(Astero)
+                    listAstero.pop(idAstero)
+                    listAsteroX.pop(idAstero)
+                    listAsteroY.pop(idAstero)
+
+                if NbreTentative == 3:
+                    Explosion = mixer.Sound("AsteroideDetruit.wav")
+                    Explosion.set_volume(0.5)
+                    Explosion.play()
     window.after(3, animation_laser)
 
-class CollisionLaserAstero(Thread):
-    def __init__(self):
-        Thread.__init__(self)
-        self.start()
-    def run(self):
-        global Wplan
-        global AsteroX
-        global AsteroY
-        global LaCollisionLaser
-        global NbrePoints
-        global Astero
-        global listAstero
-        global Wasteroide
-        while LaCollisionLaser == False:
-            Cordo = Wplan.coords(Wfusee)
-            LaserX = Cordo.pop(0) + 87.5 + 10
-            LaserY = Cordo.pop(0) + 1
 
-            for Astero in listAstero:
-                if LaserX + 15 >= (Wplan.coords(Wasteroide)[0]) - 50:
-                    if LaserY + 2.5 >= (Wplan.coords(Astero)[1]) - 50 > (LaserY) - 2.5 or (LaserY) - 2.5 <= (
-                            Wplan.coords(Astero)[1]) + 50 < (LaserY) + 2.5 or (Wplan.coords(Astero)[1]) + 50 >= (
-                            LaserY) + 2.5 > (LaserY) - 2.5 >= (Wplan.coords(Astero)[1]) - 50:
-                        Wplan.delete(Astero)
-                        for i in listAsteroX:
-                            listAsteroX[i] = random.randint(750, 1200)
-                        for i in listAsteroY:
-                            listAsteroY[i] = random.randint(750, 1200)
-                        print("!!!!!!!!!COLLISIONAVECLELASER!!!!!!!!!!")
-                        NbrePoints += 1
-                        time.sleep(0.3)
-                        Wplan.itemconfig(CanvasPoints, text=('Nombre de Points :', NbrePoints))
+def chronometre():
+    now = default_timer() - start
+    minutes, seconds = divmod(now, 60)
+    hours, minutes = divmod(minutes, 60)
+    str_time = "%d:%02d:%02d" % (hours, minutes, seconds)
+    Wplan.itemconfigure(chrono, text=str_time, fill='white', font=Times)
+    window.after(1000, chronometre)
 
-def Exit(evt):
-    window.attributes('-fullscreen', True)
-    Wplan.bind_all('<Escape>', Tixe)
-def Tixe(evt):
-    window.attributes('-fullscreen', False)
-    Wplan.bind_all('<Escape>', Exit)
 
 class Collision(Thread):
     def __init__(self):
@@ -223,6 +267,7 @@ class Collision(Thread):
         global listAsteroY
         global listNumImage
         global Astero
+        global listAstero
 
         for i in range(3):
             time.sleep(1)
@@ -240,8 +285,6 @@ class Collision(Thread):
                     LaCollision = True
                     AsteroX = random.randint(750, 1200)
                     AsteroY = random.randint(100, 620)
-                    listAsteroX = [random.randint(750, 1200)]
-                    listAsteroY = [random.randint(100, 620)]
                     print(LaCollision)
             while LaCollision == True:
                 if len(Wplan.find_overlapping(CoordoneesFusee[0], CoordoneesFusee[1], CoordoneesFusee[2],
@@ -251,8 +294,6 @@ class Collision(Thread):
                     LaCollision = False
                     AsteroX = random.randint(750, 1200)
                     AsteroY = random.randint(100, 620)
-                    listAsteroX = [random.randint(750, 1200)]
-                    listAsteroY = [random.randint(100, 620)]
                     print(LaCollision)
                 if NombreDeVie == 2 and LaCollision == False:
                     Wplan.itemconfig(Barre, image=DeuxCarre)
@@ -265,14 +306,6 @@ class Collision(Thread):
                     window.quit()
 
 NombreDeVie = 3
-
-def chronometre():
-    now = default_timer() - start
-    minutes, seconds = divmod(now, 60)
-    hours, minutes = divmod(minutes, 60)
-    str_time = "%d:%02d:%02d" % (hours, minutes, seconds)
-    Wplan.itemconfigure(chrono, text=str_time, fill='white', font=Times)
-    window.after(1000, chronometre)
 
 class GenererAstero(Thread):
     def __init__(self):
@@ -287,13 +320,18 @@ class GenererAstero(Thread):
         global listNumImage
         global Astero
         global listAstero
+        global personnage
+        global Wplan
+        global NbrePoints
+        global RandomX
+        global RandomY
         startTime = time.time()
 
         while Vivant:
             actualTime = time.time()
             if actualTime >= startTime + 2:
-                listAsteroX.append(random.randint(750,1200))
-                listAsteroY.append(random.randint(100,620))
+                listAsteroX.append(RandomX)
+                listAsteroY.append(RandomY)
                 listNumImage.append(0)
                 startTime = actualTime
             listAstero = []
@@ -309,8 +347,44 @@ class GenererAstero(Thread):
             for Astero in listAstero:
                 Wplan.delete(Astero)
 
-'''
+"""
+class CollisionLaserAstero(Thread):
+    def __init__(self):
+        Thread.__init__(self)
+        self.start()
 
+    def run(self):
+        global Wplan
+        global AsteroX
+        global AsteroY
+        global LaCollisionLaser
+        global NbrePoints
+        global Astero
+        global listAstero
+        global Wasteroide
+        global Create_laser
+        while LaCollisionLaser == False:
+
+            print("Laser = ", Wplan.coords(personnage.id))
+            for Astero in listAstero:
+                print("Astero = ", Wplan.coords(Astero))
+
+            for Astero in listAstero:
+                for personnage in EnsembleLaser:
+                    if (Wplan.coords(personnage.id)[0]) + 20 >= (Wplan.coords(Astero)[0]) - 50 and (
+                    Wplan.coords(personnage.id)[0]) - 20 <= Wplan.coords(Astero)[0] + 50:
+                        if (Wplan.coords(personnage.id)[1]) + 3.5 >= (Wplan.coords(Astero)[1]) - 50 > (
+                        Wplan.coords(personnage.id)[1]) - 3.5 or (Wplan.coords(personnage.id)[1]) - 3.5 <= (
+                        Wplan.coords(Astero)[1]) + 50 < (Wplan.coords(personnage.id)[1]) + 3.5 or (
+                        Wplan.coords(Astero)[1]) + 50 >= (Wplan.coords(personnage.id)[1]) + 3.5 > (
+                        Wplan.coords(personnage.id)[1]) - 3.5 >= (Wplan.coords(Astero)[1]) - 50:
+                            print("!!!!!!!!!COLLISIONAVECLELASER!!!!!!!!!!")
+                            Wplan.delete(Astero)
+                            NbrePoints += 1
+                            Wplan.itemconfig(CanvasPoints, text=('Nombre de Points :', NbrePoints))
+
+"""
+'''
 def AutoAstero():
     global Passe
     global mesImages
@@ -334,6 +408,7 @@ def AutoAstero():
 window = Tk()
 window.title("SPACE JUMPER 3000")
 
+
 # Faire en sorte que la taille de la fenêtre s'adapte à n'importe quel écran :
 largeur_fenetre = window.winfo_screenwidth()
 hauteur_fenetre = window.winfo_screenheight()
@@ -350,14 +425,15 @@ EnsembleAsteroide=set()
 Temps_Generer=5000
 
 window.after(10, animation_laser)
-window.after(10, animation_asteroide)
+#window.after(10, animation_asteroide)
 #---------Image-------#
 
 Fusee=PhotoImage(file='Fusées/Fusee0.png')
 Laser=PhotoImage(file='Laser.png')
 Invisible=PhotoImage(file='invisible.png')
 
-
+#---Test---#
+personnage =""
 #------------- Graphique accueil --------#
 
 Wplan=Canvas(window, width=largeur_fenetre, height=hauteur_fenetre)
@@ -386,19 +462,27 @@ start = default_timer()
 chrono = Wplan.create_text(40, 20)
 
 #---------------#
-PositionAstero = Wplan.coords(Wasteroide)
+
 AsteroX=random.randint(750, 1200)
 AsteroY=random.randint(100, 620)
 Deltax=50
 NumImage=0
 temps=2500
-
+"""
+AsteroX=random.randint(750, 1200)
+AsteroY=random.randint(100, 620)
+Deltax=50
+NumImage=0
+temps=2500
+"""
 #--- Données importantes pour Astéroïdes qu'on va générer---#
 listAstero = []
 listAsteroX = [random.randint(750, 1200)]
 listAsteroY = [random.randint(100, 620)]
 listNumImage = [0]
 
+RandomX = random.randint(750, 1200)
+RandomY =  random.randint(100, 620)
 #--Nombres de Points---#
 NbrePoints = 0
 CanvasPoints = Wplan.create_text(largeur_fenetre/2, 20, text=('Nombre de Points :', NbrePoints), fill='white', font=Times)
@@ -415,8 +499,6 @@ Wplan.bind_all('<Escape>', Exit)
 #----Tir laser--------#
 window.bind('<space>', Create_laser)
 
-#---Nombre de vies---#
-NombresVie = 3
 
 #---Barre de Vie---#
 TroisCarre=PhotoImage(file='img/Barre de Progression/3.png')
@@ -425,18 +507,17 @@ DeuxCarre=PhotoImage(file='img/Barre de Progression/2.png')
 UnCarre=PhotoImage(file='img/Barre de Progression/1.png')
 GameOver=PhotoImage(file='img/Barre de Progression/Game Over.png')
 
+#---MusiqueDeFond---#
 Vivant=True
 Passe=True
 
-PremiereCollision = False
-DeuxiemeCollision = False
 
 #CollisionLaserAstero()
-#Collision()
+Collision()
 chronometre()
 #Attaque()
-#GenererAstero()
-Create_asteroide()
+GenererAstero()
+#Create_asteroide()
 #aeiouy()
 
 window.mainloop()

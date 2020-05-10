@@ -6,6 +6,12 @@ import os
 from PIL import Image, ImageTk
 import openpyxl
 import time
+from pygame import mixer
+
+mixer.init()
+mixer.music.load("DuaLipa.mp3")
+mixer.music.play(-1)
+mixer.music.set_volume(0.2)
 
 def ChangePage():
     os.startfile("PartieJeu.py")
