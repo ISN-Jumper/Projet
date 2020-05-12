@@ -193,6 +193,7 @@ class Collision(Thread):
             GenererAstero()
             animation_laser()
             DetectionCollision()
+        time.sleep(1)
 
 
 def GenererAstero():
@@ -206,12 +207,13 @@ def GenererAstero():
         actualTime = time.time()
         if actualTime >= generateTime + 1:
             generateTime = actualTime
-            AsteroX = random.randint(700, 1200)
+            AsteroX = random.randint(800, 1200)
             AsteroY = random.randint(100, 620)
             Astero = Wplan.create_image(AsteroX, AsteroY, image=mesImages[0])
             dicoAstero[Astero] = [AsteroX, AsteroY, 0]
             if dicoAstero[Astero][0] <= 0:
                 Wplan.delete(dicoAstero[Astero])
+                print("AsteroEliminé")
         if actualTime >= refreshTime +0.35:
             refreshTime = actualTime
             for Astero in dicoAstero:
@@ -376,6 +378,5 @@ chronometre()
 #Attaque()
 #Create_asteroide()
 #aeiouy()
-DetectionCollision()
 print(f'{dicoAstero}')
 window.mainloop()
