@@ -91,8 +91,6 @@ class Perso:
         global Wplan
         global NbreTentative
 
-        self.id
-
         self.Wplan.move(self.id, 6, 0)
 
 
@@ -109,7 +107,7 @@ def Create_laser(event):
 
 
 
-def animation_laser():
+def animation_collsion_laser():
     global NbreTentative
     global NumImage
     global NbrePoints
@@ -151,7 +149,7 @@ def animation_laser():
                         print("NbreTentative",NbreTentative)
                         if NbreTentative >= 3:
                             Wplan.itemconfig(personnage.id, image=Invisible)
-                            Wplan.coords(Astero, largeur_fenetre - 10, Wplan.coords(Astero)[1])
+                            Wplan.coords(Astero, largeur_fenetre + 10   , Wplan.coords(Astero)[1])
                             AsteroideDetruit = mixer.Sound("AsteroideDetruit.wav")
                             AsteroideDetruit.set_volume(0.15)
                             AsteroideDetruit.play()
@@ -178,7 +176,7 @@ def chronometre():
     window.after(1000, chronometre)
 
 
-class Collision(Thread):
+class Principale(Thread):
     def __init__(self):
         Thread.__init__(self)
         self.start()
@@ -191,7 +189,7 @@ class Collision(Thread):
         Vivant = True
         while Vivant:
             GenererAstero()
-            animation_laser()
+            animation_collsion_laser()
             DetectionCollision()
         time.sleep(1)
 
@@ -200,8 +198,6 @@ def GenererAstero():
     global mesImages
     global Wplan
     global generateTime, refreshTime
-
-    listSuppresionAstero = []
 
     if Vivant:
         actualTime = time.time()
@@ -372,8 +368,7 @@ with open(CSV_Score, 'w') as Score:
     ajout= csv.writer(Score, delimiter=',')
     ajout.writerow(listeScore)
 
-#CollisionLaserAstero()
-Collision()
+Principale()
 chronometre()
 #Attaque()
 #Create_asteroide()
