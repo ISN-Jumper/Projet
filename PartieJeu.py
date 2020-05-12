@@ -11,6 +11,7 @@ import csv
 
 
 Nb_Collision = 0
+JeuTermine = False
 
 
 PremiereCollision = False
@@ -145,13 +146,15 @@ def animation_collsion_laser():
                         Explosion = mixer.Sound("BruitageCraquement.wav")
                         Explosion.set_volume(0.5)
                         Explosion.play()
-                        NbreTentative += 0.1
+                        NbreTentative += 1
+                        Wplan.itemconfig(personnage.id, image=Invisible)
+                        Wplan.coords(personnage.id, largeur_fenetre + 10, Wplan.coords(personnage.id)[1])
                         print("NbreTentative",NbreTentative)
                         if NbreTentative >= 3:
                             Wplan.itemconfig(personnage.id, image=Invisible)
-                            Wplan.coords(Astero, largeur_fenetre + 10   , Wplan.coords(Astero)[1])
+                            Wplan.coords(personnage.id, largeur_fenetre + 10, Wplan.coords(personnage.id)[1])
                             AsteroideDetruit = mixer.Sound("AsteroideDetruit.wav")
-                            AsteroideDetruit.set_volume(0.15)
+                            AsteroideDetruit.set_volume(0.5)
                             AsteroideDetruit.play()
                             toPopAstero.append(Astero)
                             NbreTentative = 0
@@ -164,7 +167,6 @@ def animation_collsion_laser():
         for personnage in toPopPerso:
             Wplan.delete(personnage.id)
             EnsembleLaser.remove(personnage)
-            print("ToPopPerso", toPopPerso)
 
 
 def chronometre():
@@ -207,9 +209,7 @@ def GenererAstero():
             AsteroY = random.randint(100, 620)
             Astero = Wplan.create_image(AsteroX, AsteroY, image=mesImages[0])
             dicoAstero[Astero] = [AsteroX, AsteroY, 0]
-            if dicoAstero[Astero][0] <= 0:
-                Wplan.delete(dicoAstero[Astero])
-                print("AsteroEliminé")
+
         if actualTime >= refreshTime +0.35:
             refreshTime = actualTime
             for Astero in dicoAstero:
@@ -217,6 +217,9 @@ def GenererAstero():
                     AsteroX = random.randint(750, 1200)
                     AsteroY = random.randint(100, 620)
                     dicoAstero[Astero] = [AsteroX, AsteroY, 0]
+                if dicoAstero[Astero][0] <= 0:
+                    Wplan.delete(dicoAstero[Astero])
+                    print("AsteroEliminé")
 
                 Wplan.move(Astero, -Deltax, 0)
                 Wplan.itemconfigure(Astero, image=mesImages[dicoAstero[Astero][2]])
@@ -232,12 +235,13 @@ def DetectionCollision():
     global mesImages, NumImage
     global listeScore
     global NbrePoints
+    global JeuTermine
 
     global PremiereCollision, DeuxiemeCollision, TroisiemeCollision
 
     if Vivant == True:
         for Astero in dicoAstero:
-            if (Wplan.coords(Wfusee)[0]) + 72.5 >= (Wplan.coords(Astero)[0]) - 50:
+            if (Wplan.coords(Wfusee)[0]) + 87.5 >= (Wplan.coords(Astero)[0]) - 50:
                 if (Wplan.coords(Wfusee)[1]) + 25 >= (Wplan.coords(Astero)[1]) - 50 > (
                 Wplan.coords(Wfusee)[1]) - 25 or (Wplan.coords(Wfusee)[1]) - 25 <= (Wplan.coords(Astero)[1]) + 50 < (
                 Wplan.coords(Wfusee)[1]) + 25 or (Wplan.coords(Astero)[1]) + 50 >= (Wplan.coords(Wfusee)[1]) + 25 > (
@@ -257,7 +261,7 @@ def DetectionCollision():
                         DeuxiemeCollision = True
                         time.sleep(0.1)
                     elif DeuxiemeCollision == True:
-                        listeScore.append(NbrePoints)
+                        print("ListeScore = ", listeScore)
                         os.startfile("GameOverPage.py")
                         window.quit()
 
@@ -360,13 +364,8 @@ GameOver=PhotoImage(file='img/Barre de Progression/Game Over.png')
 Vivant=True
 
 #Traitement du meilleur Score avec le CSV---#
+listeScore = []
 
-CSV_Score='CSV_Score.csv'
-listeScore =[]
-
-with open(CSV_Score, 'w') as Score:
-    ajout= csv.writer(Score, delimiter=',')
-    ajout.writerow(listeScore)
 
 Principale()
 chronometre()
