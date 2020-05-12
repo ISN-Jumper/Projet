@@ -1,0 +1,4 @@
+# To install every package `pip install -r requirements.txt`
+pillow
+pygame
+
