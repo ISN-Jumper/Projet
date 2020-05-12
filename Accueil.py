@@ -150,8 +150,8 @@ if __name__ == '__main__':
     WFullscreen.grid()
     WFullscreen.place(x=40, y=40)
 
-    WScore = Label(window, text='Score : ', font=Times)
-    WScore.place(x=largeur_fenetre - 250, y = 50)
+    WScore = Label(window, text='Meilleur Score : ', font=Times)
+    WScore.place(x=largeur_fenetre - 390, y = 50)
 
     WPoints = Label(window, text= B1.value, font = Times )
     WPoints.place(x=largeur_fenetre - 125, y = 50)
