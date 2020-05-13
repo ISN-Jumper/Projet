@@ -152,14 +152,13 @@ def animation_collsion_laser():
                         print("NbreTentative",NbreTentative)
                         if NbreTentative >= 3:
                             AsteroideDetruit = mixer.Sound("AsteroideDetruit.wav")
-                            AsteroideDetruit.set_volume(0.1)
+                            AsteroideDetruit.set_volume(0.5)
                             AsteroideDetruit.play()
                             Wplan.itemconfig(personnage.id, image=Invisible)
                             Wplan.coords(personnage.id, largeur_fenetre - 10, Wplan.coords(personnage.id)[1])
                             toPopAstero.append(Astero)
                             NbreTentative = 0
                             NbrePoints += 1
-                            listeScore.append(NbrePoints)
                             Wplan.itemconfig(CanvasPoints, text=('Nombre de Points :', NbrePoints))
             for Astero in toPopAstero:
                 Wplan.delete(Astero)
@@ -186,7 +185,6 @@ class Principale(Thread):
         global NombreDeVie
         global Wplan
         global Wfusee, Astero, dicoAstero
-        global DetectionCollision
 
         Vivant = True
         while Vivant:
@@ -194,6 +192,7 @@ class Principale(Thread):
             animation_collsion_laser()
             DetectionCollision()
             SuppressionAstero()
+            Scores()
         time.sleep(1)
 
 
@@ -271,13 +270,33 @@ def DetectionCollision():
                         time.sleep(0.1)
                     elif DeuxiemeCollision == True:
                         Wplan.itemconfig(Barre, image=GameOver)
-                        print("ListeScore = ", listeScore)
                         os.startfile("GameOverPage.py")
                         window.quit()
         for Astero in toPopAsteroDetruit:
             Wplan.delete(Astero)
             dicoAstero.pop(Astero)
 
+
+"""
+with open(CSV, 'w') as points:
+    score = csv.writer(points, delimiter=',')
+    score.writerow(listeScore)
+else:
+listeScore[score] = listeScore[score]
+"""
+
+def Scores():
+    global NbrePoints
+
+    with open("CSV_Score.csv","r") as ScoreCSV:
+        scores = eval(ScoreCSV.read())
+        print("CSV lu")
+
+        if NbrePoints > scores:
+            with open("CSV_Score.csv", "w") as ScoreCSV:
+                ScoreCSV.write(str(NbrePoints))
+                print("Nombres de points = ", NbrePoints)
+                print("Remplacement meilleur score")
 
 
 window = Tk()
@@ -349,6 +368,12 @@ temps=2500
 #--- Données importantes pour Astéroïdes qu'on va générer---#
 dicoAstero = {}
 
+#---Gestion CSV---#
+CSV='CSV_Score.csv'
+listeScore = [0]
+MeilleurScore = listeScore[0]
+
+
 
 #--Nombres de Points---#
 NbrePoints = 0
@@ -376,14 +401,10 @@ GameOver=PhotoImage(file='img/Barre de Progression/Game Over.png')
 #---MusiqueDeFond---#
 Vivant=True
 
-#Traitement du meilleur Score avec le CSV---#
-listeScore = []
-
-
 Principale()
 chronometre()
-#Attaque()
-#Create_asteroide()
-#aeiouy()
+
+print("MeilleurScore =", listeScore[0])
+
 print(f'{dicoAstero}')
 window.mainloop()

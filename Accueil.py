@@ -7,6 +7,7 @@ from PIL import Image, ImageTk
 import openpyxl
 import time
 from pygame import mixer
+import csv
 
 mixer.init()
 mixer.music.load("DuaLipa.mp3")
@@ -95,16 +96,10 @@ if __name__ == '__main__':
     Titre = Image.open('Titre.png')
     TkTitre= ImageTk.PhotoImage(Titre)
 
-    #------- Configuration du score --------#
 
-    #workbook = Workbook()
-    worksheets = openpyxl.load_workbook("Score.xlsx")
-    worksheet = worksheets.active
-    B1 = worksheet.cell(row=1, column=2)
-
-    #c1= worksheet['B1']
-    #c1.value ='0'
-    #workbook.save('Score.xlsx')
+    #---Lecture du meilleur score sur le CSV---#
+    with open("CSV_Score.csv","r") as ScoreCSV:
+        meilleur_score = eval(ScoreCSV.read())
 
     #------------- Graphique accueil --------#
 
@@ -153,7 +148,7 @@ if __name__ == '__main__':
     WScore = Label(window, text='Meilleur Score : ', font=Times)
     WScore.place(x=largeur_fenetre - 390, y = 50)
 
-    WPoints = Label(window, text= B1.value, font = Times )
+    WPoints = Label(window, text= meilleur_score, font = Times )
     WPoints.place(x=largeur_fenetre - 125, y = 50)
 
     FuseeAnim()
