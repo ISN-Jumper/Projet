@@ -102,7 +102,7 @@ def Create_laser(event):
     global personnage, new_Laser
     new_Laser = True
     MusiqueLaser = mixer.Sound("BruitageLaserWav.wav")
-    MusiqueLaser.set_volume(0.15)
+    MusiqueLaser.set_volume(0.1)
     MusiqueLaser.play()
 
 
@@ -125,7 +125,7 @@ def animation_collsion_laser():
             personnage = Perso(LaserX, LaserY, Wplan)
             EnsembleLaser.append(personnage)
             Bruitage = mixer.Sound("BruitageLaserWav.wav")
-            Bruitage.set_volume(0.1)
+            Bruitage.set_volume(0)
             Bruitage.play()
             new_Laser = False
 
@@ -144,17 +144,17 @@ def animation_collsion_laser():
                     if (Wplan.coords(personnage.id)[1]) + 1.75 >= (Wplan.coords(Astero)[1]) - 50 > (Wplan.coords(personnage.id)[1]) - 1.75 or (Wplan.coords(personnage.id)[1]) - 1.75 <= (Wplan.coords(Astero)[1]) + 50 < (Wplan.coords(personnage.id)[1]) + 1.75 or (Wplan.coords(Astero)[1]) + 50 >= (Wplan.coords(personnage.id)[1]) + 1.75 > (Wplan.coords(personnage.id)[1]) - 1.75 >= (Wplan.coords(Astero)[1]) - 50:
                         # Wplan.coords(personnage.id, largeur_fenetre - 10, Wplan.coords(personnage.id)[1])
                         Explosion = mixer.Sound("BruitageCraquement.wav")
-                        Explosion.set_volume(0.5)
+                        Explosion.set_volume(0.1)
                         Explosion.play()
                         NbreTentative += 1
                         Wplan.itemconfig(personnage.id, image=Invisible)
-                        Wplan.coords(personnage.id, largeur_fenetre + 10, Wplan.coords(personnage.id)[1])
+                        Wplan.coords(personnage.id, largeur_fenetre - 10, Wplan.coords(personnage.id)[1])
                         print("NbreTentative",NbreTentative)
                         if NbreTentative >= 3:
                             Wplan.itemconfig(personnage.id, image=Invisible)
-                            Wplan.coords(personnage.id, largeur_fenetre + 10, Wplan.coords(personnage.id)[1])
+                            Wplan.coords(personnage.id, largeur_fenetre - 10, Wplan.coords(personnage.id)[1])
                             AsteroideDetruit = mixer.Sound("AsteroideDetruit.wav")
-                            AsteroideDetruit.set_volume(0.5)
+                            AsteroideDetruit.set_volume(0.1)
                             AsteroideDetruit.play()
                             toPopAstero.append(Astero)
                             NbreTentative = 0
@@ -239,19 +239,18 @@ def DetectionCollision():
 
     global PremiereCollision, DeuxiemeCollision, TroisiemeCollision
 
+    toPopAsteroDetruit = []
+
     if Vivant == True:
         for Astero in dicoAstero:
-            if (Wplan.coords(Wfusee)[0]) + 87.5 >= (Wplan.coords(Astero)[0]) - 50:
-                if (Wplan.coords(Wfusee)[1]) + 25 >= (Wplan.coords(Astero)[1]) - 50 > (
-                Wplan.coords(Wfusee)[1]) - 25 or (Wplan.coords(Wfusee)[1]) - 25 <= (Wplan.coords(Astero)[1]) + 50 < (
-                Wplan.coords(Wfusee)[1]) + 25 or (Wplan.coords(Astero)[1]) + 50 >= (Wplan.coords(Wfusee)[1]) + 25 > (
-                Wplan.coords(Wfusee)[1]) - 25 >= (Wplan.coords(Astero)[1]) - 50:
+            if (Wplan.coords(Wfusee)[0]) + 87.5 >= (Wplan.coords(Astero)[0]) - 50 and (Wplan.coords(Wfusee)[0]) - 87.5 <= (Wplan.coords(Astero)[0]) + 50 :
+                if (Wplan.coords(Wfusee)[1]) + 25 >= (Wplan.coords(Astero)[1]) - 50 > (Wplan.coords(Wfusee)[1]) - 25 or (Wplan.coords(Wfusee)[1]) - 25 <= (Wplan.coords(Astero)[1]) + 50 < (Wplan.coords(Wfusee)[1]) + 25 or(Wplan.coords(Astero)[1]) + 50 >= (Wplan.coords(Wfusee)[1]) + 25 > (Wplan.coords(Wfusee)[1]) - 25 >= (Wplan.coords(Astero)[1]) - 50:
 
                     Wplan.itemconfig(Astero, image=Invisible)
-                    Wplan.coords(Astero, Wplan.coords(Astero)[0] + 460, Wplan.coords(Astero)[1])
+                    Wplan.coords(Astero, Wplan.coords(Astero)[0] + 500, Wplan.coords(Astero)[1])
                     print("Coordonnées Astéro : ", Wplan.coords(Astero))
                     print("Coordonnées Fusée : ", Wplan.coords(Wfusee))
-
+                    toPopAsteroDetruit.append(Astero)
                     if PremiereCollision == False:
                         Wplan.itemconfig(Barre, image=DeuxCarre)
                         PremiereCollision = True
@@ -261,9 +260,13 @@ def DetectionCollision():
                         DeuxiemeCollision = True
                         time.sleep(0.1)
                     elif DeuxiemeCollision == True:
+                        Wplan.itemconfig(Barre, image=GameOver)
                         print("ListeScore = ", listeScore)
                         os.startfile("GameOverPage.py")
                         window.quit()
+        for Astero in toPopAsteroDetruit:
+            Wplan.delete(Astero)
+            dicoAstero.pop(Astero)
 
 
 
