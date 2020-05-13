@@ -125,7 +125,7 @@ def animation_collsion_laser():
             personnage = Perso(LaserX, LaserY, Wplan)
             EnsembleLaser.append(personnage)
             Bruitage = mixer.Sound("BruitageLaserWav.wav")
-            Bruitage.set_volume(0)
+            Bruitage.set_volume(0.1)
             Bruitage.play()
             new_Laser = False
 
@@ -151,11 +151,11 @@ def animation_collsion_laser():
                         Wplan.coords(personnage.id, largeur_fenetre - 10, Wplan.coords(personnage.id)[1])
                         print("NbreTentative",NbreTentative)
                         if NbreTentative >= 3:
-                            Wplan.itemconfig(personnage.id, image=Invisible)
-                            Wplan.coords(personnage.id, largeur_fenetre - 10, Wplan.coords(personnage.id)[1])
                             AsteroideDetruit = mixer.Sound("AsteroideDetruit.wav")
                             AsteroideDetruit.set_volume(0.1)
                             AsteroideDetruit.play()
+                            Wplan.itemconfig(personnage.id, image=Invisible)
+                            Wplan.coords(personnage.id, largeur_fenetre - 10, Wplan.coords(personnage.id)[1])
                             toPopAstero.append(Astero)
                             NbreTentative = 0
                             NbrePoints += 1
@@ -193,6 +193,7 @@ class Principale(Thread):
             GenererAstero()
             animation_collsion_laser()
             DetectionCollision()
+            SuppressionAstero()
         time.sleep(1)
 
 
@@ -200,6 +201,7 @@ def GenererAstero():
     global mesImages
     global Wplan
     global generateTime, refreshTime
+
 
     if Vivant:
         actualTime = time.time()
@@ -217,14 +219,24 @@ def GenererAstero():
                     AsteroX = random.randint(750, 1200)
                     AsteroY = random.randint(100, 620)
                     dicoAstero[Astero] = [AsteroX, AsteroY, 0]
-                if dicoAstero[Astero][0] <= 0:
-                    Wplan.delete(dicoAstero[Astero])
-                    print("AsteroEliminé")
 
                 Wplan.move(Astero, -Deltax, 0)
                 Wplan.itemconfigure(Astero, image=mesImages[dicoAstero[Astero][2]])
                 dicoAstero[Astero][2] += 1
                 dicoAstero[Astero][0] -= Deltax
+
+def SuppressionAstero():
+    global Astero, dicoAstero
+
+    listSuppressionAstero = []
+    for Astero in dicoAstero:
+        if dicoAstero[Astero][0] <= 0:
+            listSuppressionAstero.append(Astero)
+    for Astero in listSuppressionAstero:
+        Wplan.delete(Astero)
+        dicoAstero.pop(Astero)
+        print("Astéroide Supprimé")
+
 
 
 
@@ -246,8 +258,6 @@ def DetectionCollision():
             if (Wplan.coords(Wfusee)[0]) + 87.5 >= (Wplan.coords(Astero)[0]) - 50 and (Wplan.coords(Wfusee)[0]) - 87.5 <= (Wplan.coords(Astero)[0]) + 50 :
                 if (Wplan.coords(Wfusee)[1]) + 25 >= (Wplan.coords(Astero)[1]) - 50 > (Wplan.coords(Wfusee)[1]) - 25 or (Wplan.coords(Wfusee)[1]) - 25 <= (Wplan.coords(Astero)[1]) + 50 < (Wplan.coords(Wfusee)[1]) + 25 or(Wplan.coords(Astero)[1]) + 50 >= (Wplan.coords(Wfusee)[1]) + 25 > (Wplan.coords(Wfusee)[1]) - 25 >= (Wplan.coords(Astero)[1]) - 50:
 
-                    Wplan.itemconfig(Astero, image=Invisible)
-                    Wplan.coords(Astero, Wplan.coords(Astero)[0] + 500, Wplan.coords(Astero)[1])
                     print("Coordonnées Astéro : ", Wplan.coords(Astero))
                     print("Coordonnées Fusée : ", Wplan.coords(Wfusee))
                     toPopAsteroDetruit.append(Astero)
