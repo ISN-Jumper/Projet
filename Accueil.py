@@ -5,27 +5,38 @@ from tkinter import font
 import os
 from PIL import Image, ImageTk
 import openpyxl
+import time
+from pygame import mixer
+
+mixer.init()
+mixer.music.load("DuaLipa1.mp3")
+mixer.music.play(-1)
+mixer.music.set_volume(0.2)
 
 def ChangePage():
-    os.startfile("PartieJeu.py") #Redirection vers le fichier contenant le programme contenant le code pour le jeu
+    os.startfile("PartieJeu.py")
+    window.quit()
+
+def PageBoutique():
+    os.startfile("Boutique.py")
     window.quit()
 
 def Exit(evt):
-    window.attributes('-fullscreen', True) # lorsque le joueur appuie sur echap le jeu est en plein ecran
-    Wplan.bind_all('<Escape>', Exit_inverse) # si il réappuie sur echap, le jeu redeviendra en fenêtré grâce à la fonction Exit_inverse
-def Exit_inverse(evt):
+    window.attributes('-fullscreen', True)
+    Wplan.bind_all('<Escape>', Tixe)
+def Tixe(evt):
     window.attributes('-fullscreen', False)
     Wplan.bind_all('<Escape>', Exit)
 
-def FullScreen():    # les fonctions FullEcran sont identiques à "Exit" mais elles sont utilisés à l'aide d'un bouton
+def FullEcran():
     window.attributes('-fullscreen', False)
-    WFullscreen.config(command = lambda : FullScreen2())
-def FullScreen2():
+    WFullscreen.config(command = lambda : FullEcran2())
+def FullEcran2():
     window.attributes('-fullscreen', True)
-    WFullscreen.config(command= lambda : FullScreen())
+    WFullscreen.config(command= lambda : FullEcran())
 
 
-def FuseeAnim(): #Cette fonction a été conçue pour l'animation lorsque le jeu est lancé
+def FuseeAnim():
     global Wfusee, deltaX, deltaY, FuseePil, Fusee, Passer, NumImage
 
     if Wplan.coords(Wfusee)[0] < (largeur_fenetre//2)-56 and Wplan.coords(Wfusee)[1] == 360 :
@@ -57,7 +68,7 @@ NumImage=0
 Passer = False
 
 def TitreJumper():
-    Wtitre=Wplan.create_image(largeur_fenetre//2, (hauteur_fenetre//2)-75, image=TkTitre) # Une fois la fusée posée, le titre s'affiche
+    Wtitre=Wplan.create_image(largeur_fenetre//2, (hauteur_fenetre//2)-75, image=TkTitre)
 
 
 if __name__ == '__main__':
@@ -71,11 +82,14 @@ if __name__ == '__main__':
 
     window.geometry("%dx%d+0+0" % (largeur_fenetre,hauteur_fenetre))
     window.attributes('-fullscreen', True)
+    #window.geometry("1280x720+40+50")
 
     #------- Police -------#
 
     Times = font.Font(family='Times', size=24, weight='bold')
     Times2 = font.Font(family='Times', size=16, weight='bold')
+
+    #Ciel=PhotoImage(file='CielAccueil.png')
 
     #------Config Image-----#
 
@@ -88,9 +102,10 @@ if __name__ == '__main__':
 
     #------- Configuration du score --------#
 
-    worksheets = openpyxl.load_workbook("Score.xlsx") #Le programme charge le fichier excel contenant le score
+    #workbook = Workbook()
+    worksheets = openpyxl.load_workbook("Score.xlsx")
     worksheet = worksheets.active
-    B1 = worksheet.cell(row=1, column=2)     #Le programme lit la cellule B1 contenant le score du joueur et l'affiche avec un widget créé plus bas
+    B1 = worksheet.cell(row=1, column=2)
 
     #------------- Graphique accueil --------#
 
@@ -102,6 +117,11 @@ if __name__ == '__main__':
     Ciel = ImageTk.PhotoImage(WCCiel)
     WCiel = Wplan.create_image((largeur_fenetre // 2) - 2, (hauteur_fenetre // 2) - 2, image=Ciel)
 
+    window.iconbitmap('Fusées/FuseeFeu3.ico')
+
+  #  FuseePil = Image.open("fusée2.png")
+ #   FuseePil = FuseePil.rotate(45)
+   # Fusee = ImageTk.PhotoImage(FuseePil)
     deltaX=-20
     deltaY=360
     Wfusee = Wplan.create_image(deltaX, deltaY, image=FuseeFeu)
@@ -121,27 +141,21 @@ if __name__ == '__main__':
     Jouer.grid()
     Jouer.place(x=(largeur_fenetre//2)-100, y=(hauteur_fenetre//1.5))
 
-    Boutique = Button(window, text='Boutique', width=12, font=Times2) #Fonctionnalité à venir
+    Boutique = Button(window, text='Boutique', width=12, font=Times2, command=lambda: PageBoutique())
     Boutique.grid()
     Boutique.place(x=(largeur_fenetre // 2) - 86, y=(hauteur_fenetre // 1.35))
 
-    Wquitter = Button(window, text="Quitter", font=Times2, command=window.quit) # Bouton permettant de quitter le jeu
+    Wquitter = Button(window, text="Quitter", font=Times2, command=window.quit)
     Wquitter.grid()
     Wquitter.place(x=50, y= hauteur_fenetre -150)
 
-    WFullscreen = Button(window, text="Plein Ecran", font=Times2, command=FullScreen) # Bouton permettant d'afficher le jeu en plein ecran
+    WFullscreen = Button(window, text="Plein Ecran", font=Times2, command=FullEcran)
     WFullscreen.grid()
     WFullscreen.place(x=40, y=40)
 
-    #Affichage du score du joueur :
-
-    WScore = Label(window, text='Score : ', font=Times)
-    WScore.place(x=largeur_fenetre - 250, y = 50)
-
-    WPoints = Label(window, text= B1.value, font = Times )
-    WPoints.place(x=largeur_fenetre - 125, y = 50)
-
-    # ---------------------  #
+    WScore = Wplan.create_text(largeur_fenetre - 190, 35, text='Banque : ', font=Times, fill='yellow',activefill='white')
+    WPoints = Wplan.create_text(largeur_fenetre - 70, 35, text=str(B1.value) + " $", font=Times, fill='yellow',activefill='white')
+    Wplan.create_line(largeur_fenetre - 255, 57, largeur_fenetre - 20, 57, fill='white', activefill='yellow', width=4)
     FuseeAnim()
 
     window.mainloop()

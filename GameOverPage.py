@@ -29,6 +29,7 @@ Ciel = PhotoImage(file='Ciel.png')
 GameOver = PhotoImage(file='img/Barre de Progression/Game Over.png')
 
 # ------------- Graphique accueil --------#
+window.iconbitmap('Fusées/FuseeFeu3.ico')
 
 Wplan = Canvas(window, width=largeur_fenetre, height=hauteur_fenetre)
 Wplan.grid()
