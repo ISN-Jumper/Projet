@@ -13,6 +13,11 @@ import csv
 Nb_Collision = 0
 JeuTermine = False
 
+Niveau1 = 0
+Niveau2 = 0
+Niveau3 = 0
+Niveau4 = 0
+
 
 PremiereCollision = False
 DeuxiemeCollision = False
@@ -38,7 +43,7 @@ def Haut(evt):
     global Wfusee
     PositionFusee = Wplan.coords(Wfusee)
     PosY = PositionFusee.pop(1)
-    if PosY -65 > 35:  # L'axe des ordonnées est dirigé vers le bas
+    if PosY -65 > 35:
         Wplan.coords(Wfusee, PositionFusee, PosY - 65)
     else:
         Wplan.coords(Wfusee, PositionFusee, PosY)
@@ -169,12 +174,15 @@ def animation_collsion_laser():
 
 
 def chronometre():
+    global str_time
     now = default_timer() - start
     minutes, seconds = divmod(now, 60)
     hours, minutes = divmod(minutes, 60)
     str_time = "%d:%02d:%02d" % (hours, minutes, seconds)
     Wplan.itemconfigure(chrono, text=str_time, fill='white', font=Times)
     window.after(1000, chronometre)
+
+str_time ="%d:%02d:%02d"
 
 
 class Principale(Thread):
@@ -185,6 +193,7 @@ class Principale(Thread):
         global NombreDeVie
         global Wplan
         global Wfusee, Astero, dicoAstero
+        global str_time
 
         Vivant = True
         while Vivant:
@@ -200,8 +209,6 @@ def GenererAstero():
     global mesImages
     global Wplan
     global generateTime, refreshTime
-
-
     if Vivant:
         actualTime = time.time()
         if actualTime >= generateTime + 1:
@@ -275,6 +282,7 @@ def DetectionCollision():
         for Astero in toPopAsteroDetruit:
             Wplan.delete(Astero)
             dicoAstero.pop(Astero)
+
 
 
 """
@@ -358,13 +366,7 @@ chrono = Wplan.create_text(40, 20)
 Deltax=50
 NumImage=0
 temps=2500
-"""
-AsteroX=random.randint(750, 1200)
-AsteroY=random.randint(100, 620)
-Deltax=50
-NumImage=0
-temps=2500
-"""
+
 #--- Données importantes pour Astéroïdes qu'on va générer---#
 dicoAstero = {}
 
@@ -403,6 +405,7 @@ Vivant=True
 
 Principale()
 chronometre()
+
 
 print("MeilleurScore =", listeScore[0])
 

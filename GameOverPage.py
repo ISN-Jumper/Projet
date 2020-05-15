@@ -1,9 +1,10 @@
 from tkinter import *
 from tkinter import font
 import os
+import csv
 
 def ChangePage():
-    os.startfile("Accueil.py")
+    os.startfile("PartieJeu.py")
     window.quit()
 
 window = Tk()
@@ -15,6 +16,10 @@ hauteur_fenetre = window.winfo_screenheight()
 
 window.geometry("%dx%d+0+0" % (largeur_fenetre, hauteur_fenetre))
 window.attributes('-fullscreen', True)
+
+#---Gestion Meilleur Score ---#
+with open("CSV_Score.csv", "r") as ScoreCSV:
+    meilleur_score = eval(ScoreCSV.read())
 
 # ------- Police -------#
 
@@ -30,10 +35,22 @@ Wplan.grid()
 Wplan.create_image(640, 360, image=Ciel)
 Wplan.create_image((largeur_fenetre//2),(hauteur_fenetre//2),image=GameOver)
 
-Jouer = Button(window, text='Rejouer', width=5, height=1, font=Times, command=lambda: ChangePage())
-Jouer.grid()
-Jouer.place(x=(largeur_fenetre // 2.1), y=(hauteur_fenetre // 1.75))
+#---Frame Score---#
+FrameScore = Frame(window, relief='flat')
+FrameScore.place(x=360, y=100)
 
-Wquitter = Button(window, text="Quitter", command=window.quit).grid()
+WScore = Label(window, text='Meilleur Score : ', font=Times)
+WScore.grid(row=1, column=0)
+
+
+#---Frame Boutons---#
+FrameButtons = Frame(window, relief='flat')
+FrameButtons.place(x=(largeur_fenetre//2.25), y=(hauteur_fenetre//1.85))
+
+Jouer = Button(FrameButtons, text='Rejouer', width=5, height=1, font=Times, command=lambda: ChangePage())
+Jouer.grid(row=1,column=0)
+
+Wquitter = Button(FrameButtons, text="Quitter", font=Times, command=window.quit)
+Wquitter.grid(row=1,column=1)
 
 window.mainloop()

@@ -15,7 +15,7 @@ mixer.music.play(-1)
 mixer.music.set_volume(0.2)
 
 def ChangePage():
-    os.startfile("PartieJeu.py")
+    os.startfile("C:/Users/User/Desktop/ProjetTest2/PartieJeu.py")
     window.quit()
 def Exit(evt):
     window.attributes('-fullscreen', True)
@@ -31,6 +31,13 @@ def FullEcran2():
     window.attributes('-fullscreen', True)
     WFullscreen.config(command= lambda : FullEcran())
 
+def Copyrights():
+    os.startfile("C:/Users/User/Desktop/ProjetTest2/Copyrights.py")
+    window.quit()
+
+def Commandes():
+    os.startfile("C:/Users/User/Desktop/ProjetTest2/Commandes.py")
+    window.quit()
 
 def FuseeAnim():
     global Wfusee, deltaX, deltaY, FuseePil, Fusee, Passer, NumImage
@@ -137,6 +144,12 @@ if __name__ == '__main__':
     Boutique.grid()
     Boutique.place(x=(largeur_fenetre // 2) - 86, y=(hauteur_fenetre // 1.35))
 
+    Commandes = Button(window, text='Commandes', width=12, font=Times2, command=lambda: Commandes())
+    Commandes.grid()
+    Commandes.place(x=(largeur_fenetre - 215) , y=(hauteur_fenetre - 200))
+
+
+
     Wquitter = Button(window, text="Quitter", font=Times2, command=window.quit)
     Wquitter.grid()
     Wquitter.place(x=50, y= hauteur_fenetre -150)
@@ -150,6 +163,9 @@ if __name__ == '__main__':
 
     WPoints = Label(window, text= meilleur_score, font = Times )
     WPoints.place(x=largeur_fenetre - 125, y = 50)
+
+    WCopyright = Button(window, text='Copyrights', font=Times2, command=lambda: Copyrights())
+    WCopyright.place(x=largeur_fenetre - 200, y=hauteur_fenetre - 150)
 
     FuseeAnim()
 
